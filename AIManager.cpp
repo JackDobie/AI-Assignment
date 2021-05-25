@@ -6,6 +6,8 @@
 
 #include "main.h"
 
+#include "Debug.h"
+
 
 HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 {
@@ -33,8 +35,10 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float yStart = -(SCREEN_HEIGHT / 2) + (yGap / 2);
 
     unsigned int index = 0;
-    for (unsigned int j = 0; j < WAYPOINT_RESOLUTION; j++) {
-        for (unsigned int i = 0; i < WAYPOINT_RESOLUTION; i++) {
+    for (unsigned int j = 0; j < WAYPOINT_RESOLUTION; j++)
+    {
+        for (unsigned int i = 0; i < WAYPOINT_RESOLUTION; i++)
+        {
             Waypoint* wp = new Waypoint();
             hr = wp->initMesh(pd3dDevice, index++);
             wp->setPosition(XMFLOAT3(xStart + (xGap * i), yStart + (yGap * j), 0));
@@ -47,12 +51,21 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 
 void AIManager::update(const float fDeltaTime)
 {
-    for (unsigned int i = 0; i < m_waypoints.size(); i++) {
-        m_waypoints[i]->update(fDeltaTime);
-        AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
+    Waypoint* w = GetWaypoint(5, 1);
+    if (w != nullptr)
+    {
+        w->update(fDeltaTime);
+        AddItemToDrawList(w);
     }
 
-    for (unsigned int i = 0; i < m_pickups.size(); i++) {
+    //for (unsigned int i = 0; i < m_waypoints.size(); i++)
+    //{
+    //    m_waypoints[i]->update(fDeltaTime);
+    //    //AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
+    //}
+
+    for (unsigned int i = 0; i < m_pickups.size(); i++)
+    {
         m_pickups[i]->update(fDeltaTime);
         AddItemToDrawList(m_pickups[i]);
     }
@@ -141,5 +154,59 @@ bool AIManager::checkForCollisions()
     return false;
 }
 
+Waypoint* AIManager::GetWaypoint(int x, int y)
+{
+    int index = y * WAYPOINT_RESOLUTION + x;
+    Waypoint* w = nullptr;
+    if (m_waypoints.size() > index)
+    {
+        w = m_waypoints[index];
+    }
+    return w;
+}
 
+vector<Waypoint*> AIManager::GetNeighbours(int x, int y)
+{
+    vector<Waypoint*> neighbours;
+    if (y > 0)
+    {
+        neighbours.push_back(GetWaypoint(x, y - 1)); //top
 
+        if (x > 0)
+        {
+            neighbours.push_back(GetWaypoint(x - 1, y - 1)); //top left
+        }
+
+        if (x < WAYPOINT_RESOLUTION)
+        {
+            neighbours.push_back(GetWaypoint(x + 1, y - 1)); //top right
+        }
+    }
+
+    if (x > 0)
+    {
+        neighbours.push_back(GetWaypoint(x - 1, y)); //left
+    }
+
+    if (x < WAYPOINT_RESOLUTION)
+    {
+        neighbours.push_back(GetWaypoint(x + 1, y)); //right
+    }
+
+    if (y < WAYPOINT_RESOLUTION)
+    {
+        neighbours.push_back(GetWaypoint(x, y + 1)); //right
+
+        if (x > 0)
+        {
+            neighbours.push_back(GetWaypoint(x - 1, y + 1)); //top right
+        }
+
+        if (x < WAYPOINT_RESOLUTION)
+        {
+            neighbours.push_back(GetWaypoint(x + 1, y + 1)); //bottom right
+        }
+    }
+
+    return neighbours;
+}

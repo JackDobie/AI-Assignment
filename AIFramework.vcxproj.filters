@@ -13,6 +13,7 @@
     <ClCompile Include="Background.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Debug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -32,6 +33,7 @@
     <CLInclude Include="resource.h">
       <Filter>Core</Filter>
     </CLInclude>
+    <ClInclude Include="Debug.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\blue.dds">

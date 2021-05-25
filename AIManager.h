@@ -26,6 +26,9 @@ public:
 	void	mouseUp(int x, int y);
 	void	keyPress(WPARAM param);
 
+	Waypoint* GetWaypoint(int x, int y);
+	vector<Waypoint*> GetNeighbours(int x, int y);
+
 protected:
 	bool	checkForCollisions();
 
