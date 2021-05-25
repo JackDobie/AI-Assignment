@@ -25,5 +25,6 @@ protected:
 	Vector2D m_positionTo;
 	Vector2D m_lastPosition;
 
+	Vector2D Wander();
 };
 

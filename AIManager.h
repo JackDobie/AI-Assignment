@@ -29,6 +29,8 @@ public:
 	Waypoint* GetWaypoint(int x, int y);
 	vector<Waypoint*> GetNeighbours(int x, int y);
 
+	void DrawUI();
+
 protected:
 	bool	checkForCollisions();
 
@@ -36,6 +38,6 @@ private:
 	vecWaypoints            m_waypoints;
 	vecPickups              m_pickups;
 	Vehicle*				m_pCar = nullptr;
-
+	Vehicle*				AICar = nullptr;
 };
 

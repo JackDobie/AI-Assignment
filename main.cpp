@@ -13,6 +13,10 @@
 #include "PickupItem.h"
 #include "AIManager.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
+
 
 
 //#define PICK_MODE // Ignore this, it is not needed, but might be useful for debugging
@@ -411,6 +415,15 @@ HRESULT InitDevice()
     // initialise the AI / SceneManager
     g_AIManager.initialise(g_pd3dDevice);
 
+    //imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.WantCaptureMouse = true;
+    ImGui::StyleColorsDark();
+    ImGui_ImplWin32_Init(g_hWnd);
+    ImGui_ImplDX11_Init(g_pd3dDevice, g_pImmediateContext);
+
     return S_OK;
 }
 
@@ -533,10 +546,15 @@ void CleanupDevice()
 //--------------------------------------------------------------------------------------
 // Called every time the application receives a message
 //--------------------------------------------------------------------------------------
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam )
 {
     PAINTSTRUCT ps;
     HDC hdc;
+
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+        return true;
 
     switch( message )
     {
@@ -612,6 +630,12 @@ void Update(const float deltaTime)
 //--------------------------------------------------------------------------------------
 void Render()
 {
+    //imgui
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    g_AIManager.DrawUI();
+
     // Update our time
     static float deltaTime = 0.0f;
     static ULONGLONG timeStart = 0;
@@ -643,6 +667,9 @@ void Render()
 	}
 
     g_GameObjects.clear(); // the list of items to draw is cleared each frame
+
+    ImGui::Render();
+    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
     // Present our back buffer to our front buffer
     g_pSwapChain->Present( 0, 0 );

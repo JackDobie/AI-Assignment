@@ -8,6 +8,10 @@
 
 #include "Debug.h"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
+
 
 HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 {
@@ -16,7 +20,8 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     PickupItem* pPickup = new PickupItem();
     HRESULT hr = pPickup->initMesh(pd3dDevice);
     m_pickups.push_back(pPickup);
-
+    if (FAILED(hr))
+        return hr;
 
     // create the vehicle ------------------------------------------------
     float xPos = 0;
@@ -25,6 +30,12 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     m_pCar = new Vehicle();
     hr = m_pCar->initMesh(pd3dDevice);
     m_pCar->setPosition(XMFLOAT3(xPos, yPos, 0));
+    if (FAILED(hr))
+        return hr;
+
+    AICar = new Vehicle();
+    hr = AICar->initMesh(pd3dDevice);
+    AICar->setPosition(XMFLOAT3(xPos, yPos, 0));
     if (FAILED(hr))
         return hr;
 
@@ -71,10 +82,12 @@ void AIManager::update(const float fDeltaTime)
     }
 
     m_pCar->update(fDeltaTime);
+    AICar->update(fDeltaTime);
 
     checkForCollisions();
 
     AddItemToDrawList(m_pCar);
+    AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)
@@ -209,4 +222,11 @@ vector<Waypoint*> AIManager::GetNeighbours(int x, int y)
     }
 
     return neighbours;
+}
+
+void AIManager::DrawUI()
+{
+    ImGui::Begin("Control window");
+    ImGui::Text("Hello world!");
+    ImGui::End();
 }

@@ -72,3 +72,8 @@ void Vehicle::setVehiclePosition(Vector2D position)
 	m_startPosition = position;
 	setPosition(XMFLOAT3((float)position.x, (float)position.y, 0));
 }
+
+Vector2D Vehicle::Wander()
+{
+	return Vector2D(0, 0);
+}
