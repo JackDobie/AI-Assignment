@@ -1,11 +1,9 @@
 #pragma once
 #include "DrawableGameObject.h"
-#include "Vector2D.h"
 #include "imgui/imgui.h"
+#include "Vector2D.h"
 
-#include "Steering.h"
-
-#define MAX_SPEED 200
+class Steering;
 
 class Vehicle : public DrawableGameObject
 {
@@ -24,6 +22,7 @@ public:
 	Vector2D GetVelocity() { return _velocity; }
 	void SetVelocity(Vector2D newVelocity) { _velocity = newVelocity; }
 
+	Vector2D GetTarget() { return _positionTo; }
 	void SetPositionTo(Vector2D positionTo); // a position to move to
 	void SetVehiclePosition(Vector2D position); // the current position - this resets positionTo
 

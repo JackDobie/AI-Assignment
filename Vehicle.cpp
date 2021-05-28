@@ -1,8 +1,13 @@
 #include "Vehicle.h"
+#include "Steering.h"
 
-Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(name), _maxSpeed(maxSpeed)
+Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(name), _startPosition(startPos), _maxSpeed(maxSpeed)
 {
 	SetVehiclePosition(startPos);
+	_steering = new Steering(this);
+	_currentSpeed = _maxSpeed;
+	SetVehiclePosition(Vector2D(0, 0));
+	_lastPosition = startPos;
 }
 
 HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice)
@@ -12,32 +17,36 @@ HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice)
 
 	HRESULT hr = DrawableGameObject::initMesh(pd3dDevice);
 
-	_maxSpeed = MAX_SPEED;
-	_currentSpeed = _maxSpeed;
-	SetVehiclePosition(Vector2D(0, 0));
-
-	_lastPosition = Vector2D(0, 0);
 
 	return hr;
 }
 
 void Vehicle::Update(const float deltaTime)
 {
-	// consider replacing with force based acceleration / velocity calculations
-	Vector2D vecTo = _positionTo - _currentPosition;
-	float velocity = deltaTime * _currentSpeed;
+	//calculate acceleration based on steering force
+	Vector2D acceleration = _steering->CalculateForce();
+	//add acceleration to velocity
+	_velocity += acceleration; //TODO: deltatime
+	//stops velocity from exceeding max speed
+	_velocity.Truncate(_maxSpeed);
+	//add to position with velocity
+	_currentPosition += _velocity; //TODO: deltatime
 
-	float length = (float)vecTo.Length();
-	// if the distance to the end point is less than the car would move, then only move that distance.
-	if (length > 0) {
-		vecTo.Normalize();
-		if(length > velocity)
-			vecTo *= velocity;
-		else
-			vecTo *= length;
+	//// consider replacing with force based acceleration / velocity calculations
+	//Vector2D vecTo = _positionTo - _currentPosition;
+	//float velocity = deltaTime * _currentSpeed;
 
-		_currentPosition += vecTo;
-	}
+	//float length = (float)vecTo.Length();
+	//// if the distance to the end point is less than the car would move, then only move that distance.
+	//if (length > 0) {
+	//	vecTo.Normalize();
+	//	if(length > velocity)
+	//		vecTo *= velocity;
+	//	else
+	//		vecTo *= length;
+
+	//	_currentPosition += vecTo;
+	//}
 
 	// rotate the object based on its last & current position
 	Vector2D diff = _currentPosition - _lastPosition;

@@ -2,14 +2,14 @@
 
 #pragma warning (disable:4786)
 
-#include "Vehicle.h"
+class Vehicle;
 
 class Steering
 {
 public:
-	Steering(Vehicle* veh);
+    Steering(Vehicle* veh) : vehicle(veh) {}
 
-    void CalculateForce();
+    Vector2D CalculateForce();
     
     enum class BehaviourType
     {
@@ -24,11 +24,13 @@ public:
 
     BehaviourType activeType;
 
+    float seekWeight = 5.0f;
+    float arriveWeight = 2.0f;
+    float fleeWeight = 10.0f;
 private:
     // the vehicle using this steering
 	Vehicle* vehicle;
 
-    Vector2D steeringForce;
     Vector2D target;
 private:
     bool IsActive(BehaviourType type) { return (type == activeType); }

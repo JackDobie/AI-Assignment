@@ -1,24 +1,20 @@
 #include "Steering.h"
+#include "Vehicle.h"
 
-Steering::Steering(Vehicle* veh)
+Vector2D Steering::CalculateForce()
 {
-	vehicle = veh;
-}
+	Vector2D steeringForce;
 
-void Steering::CalculateForce()
-{
 	switch (activeType)
 	{
-	case BehaviourType::none:
-		break;
 	case BehaviourType::seek:
-		//steeringForce = Seek()
+		steeringForce = Seek(vehicle->GetTarget()) * seekWeight;
 		break;
 	case BehaviourType::flee:
-		//steeringForce = Flee()
+		steeringForce = Flee(vehicle->GetTarget()) * fleeWeight;
 		break;
 	case BehaviourType::arrive:
-		//steeringForce = Flee()
+		steeringForce = Arrive(vehicle->GetTarget()) * arriveWeight;
 		break;
 	case BehaviourType::wander:
 		steeringForce = Wander();
@@ -29,14 +25,18 @@ void Steering::CalculateForce()
 	case BehaviourType::pursuit:
 		//steeringForce = Pursuit()
 		break;
+	default:
+		steeringForce = Vector2D();
 	}
+
+	return steeringForce;
 }
 
 Vector2D Steering::Seek(Vector2D _target)
 {
 	// returns a steering force that directs the vehicle towards the target
 	Vector2D desiredVelocity = Vec2DNormalize(_target - vehicle->GetPositionVector()) * vehicle->GetMaxSpeed();
-	return (desiredVelocity - vehicle->GetVelocity())
+	return (desiredVelocity - vehicle->GetVelocity());
 }
 
 Vector2D Steering::Arrive(Vector2D _target)
