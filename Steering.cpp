@@ -1,6 +1,11 @@
 #include "Steering.h"
 #include "Vehicle.h"
 
+Steering::Steering(Vehicle* veh) : vehicle(veh)
+{
+	activeType = BehaviourType::seek;
+}
+
 Vector2D Steering::CalculateForce()
 {
 	Vector2D steeringForce;
@@ -41,17 +46,17 @@ Vector2D Steering::Seek(Vector2D _target)
 
 Vector2D Steering::Arrive(Vector2D _target)
 {
-
+	return Vector2D();
 }
 
 Vector2D Steering::Flee(Vector2D _target)
 {
-
+	return Vector2D();
 }
 
 Vector2D Steering::Pursuit(Vector2D* _target)
 {
-
+	return Vector2D();
 }
 
 Vector2D Steering::Wander()
@@ -62,6 +67,7 @@ Vector2D Steering::Wander()
 	}
 
 	Vector2D seekWander = Seek(vehicle->GetWanderTarget());
+	return seekWander;
 }
 void Steering::NewWanderTarget()
 {
@@ -79,5 +85,5 @@ void Steering::NewWanderTarget()
 
 Vector2D Steering::ObstacleAvoidance()
 {
-
+	return Vector2D();
 }

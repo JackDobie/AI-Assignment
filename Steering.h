@@ -2,12 +2,14 @@
 
 #pragma warning (disable:4786)
 
+#include "Vector2D.h"
+
 class Vehicle;
 
 class Steering
 {
 public:
-    Steering(Vehicle* veh) : vehicle(veh) {}
+    Steering(Vehicle* veh);
 
     Vector2D CalculateForce();
     

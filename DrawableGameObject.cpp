@@ -1,6 +1,5 @@
 #include "DrawableGameObject.h"
 
-using namespace std;
 using namespace DirectX;
 
 #define NUM_VERTICES		36

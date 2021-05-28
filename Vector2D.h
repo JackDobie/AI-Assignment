@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------
 #include <windows.h>
 #include <limits>
+#include <fstream>
 
 const double  MinDouble = (std::numeric_limits<double>::min)();
 //compares two real numbers. Returns true if they are equal

@@ -11,15 +11,12 @@ class DrawableGameObject;
 class Waypoint;
 class PickupItem;
 
-using namespace std;
-
 struct ConstantBuffer
 {
 	XMMATRIX mWorld;
 	XMMATRIX mView;
 	XMMATRIX mProjection;
 };
-
 
 struct SimpleVertex
 {
