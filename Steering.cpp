@@ -3,7 +3,7 @@
 
 Steering::Steering(Vehicle* veh) : vehicle(veh)
 {
-	activeType = BehaviourType::seek;
+	activeType = BehaviourType::wander;
 }
 
 Vector2D Steering::CalculateForce()

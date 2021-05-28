@@ -26,11 +26,11 @@ void Vehicle::Update(const float deltaTime)
 	//calculate acceleration based on steering force
 	Vector2D acceleration = _steering->CalculateForce();
 	//add acceleration to velocity
-	_velocity += acceleration; //TODO: deltatime
+	_velocity += acceleration * deltaTime; //TODO: deltatime
 	//stops velocity from exceeding max speed
 	_velocity.Truncate(_maxSpeed);
 	//add to position with velocity
-	_currentPosition += _velocity; //TODO: deltatime
+	_currentPosition += _velocity * deltaTime; //TODO: deltatime
 
 	//// consider replacing with force based acceleration / velocity calculations
 	//Vector2D vecTo = _positionTo - _currentPosition;
@@ -92,7 +92,7 @@ void Vehicle::DrawUI()
 	ImGui::Text("Position: ", _currentPosition.x, _currentPosition.y);
 
 	ImGui::Text("\nSteering Type:");
-	static int e = 0;
+	int e = (int)_steering->activeType;
 	if (ImGui::RadioButton("None", &e, 0))
 	{
 		_steering->activeType = Steering::BehaviourType::none;

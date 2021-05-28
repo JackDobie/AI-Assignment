@@ -28,6 +28,8 @@ public:
 
 	Vector2D GetWanderTarget() { return _wanderTarget; }
 	void SetWanderTarget(Vector2D newTarget) { _wanderTarget = newTarget; }
+
+	void DrawUI();
 protected:
 	std::string _name;
 
@@ -44,7 +46,5 @@ protected:
 	Vector2D _wanderTarget;
 
 	Steering* _steering;
-private:
-	void DrawUI();
 };
 

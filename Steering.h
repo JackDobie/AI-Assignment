@@ -15,7 +15,7 @@ public:
     
     enum class BehaviourType
     {
-        none,
+        none = 0,
         seek,
         flee,
         arrive,
