@@ -9,8 +9,6 @@
 #include "Debug.h"
 
 #include "imgui/imgui.h"
-#include "imgui/imgui_impl_dx11.h"
-#include "imgui/imgui_impl_win32.h"
 
 
 HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
@@ -27,13 +25,13 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float xPos = 0;
     float yPos = 0;
 
-    m_pCar = new Vehicle();
+    m_pCar = new Vehicle("Car", Vector2D(xPos, yPos), 100.0f);
     hr = m_pCar->initMesh(pd3dDevice);
     m_pCar->setPosition(XMFLOAT3(xPos, yPos, 0));
     if (FAILED(hr))
         return hr;
 
-    AICar = new Vehicle();
+    AICar = new Vehicle("AICar", Vector2D(xPos, yPos), 100.0f);
     hr = AICar->initMesh(pd3dDevice);
     AICar->setPosition(XMFLOAT3(xPos, yPos, 0));
     if (FAILED(hr))
@@ -81,8 +79,8 @@ void AIManager::update(const float fDeltaTime)
         AddItemToDrawList(m_pickups[i]);
     }
 
-    m_pCar->update(fDeltaTime);
-    AICar->update(fDeltaTime);
+    m_pCar->Update(fDeltaTime);
+    AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
@@ -92,7 +90,7 @@ void AIManager::update(const float fDeltaTime)
 
 void AIManager::mouseUp(int x, int y)
 {
-    m_pCar->setPositionTo(Vector2D(x, y));
+    m_pCar->SetPositionTo(Vector2D(x, y));
 }
 
 void AIManager::keyPress(WPARAM param)

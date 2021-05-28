@@ -34,9 +34,15 @@ private:
     bool IsActive(BehaviourType type) { return (type == activeType); }
 
     Vector2D Seek(Vector2D _target);
+
     Vector2D Arrive(Vector2D _target);
+
     Vector2D Flee(Vector2D _target);
-    Vector2D Pursuit(Vector2D _target);
+
+    Vector2D Pursuit(Vector2D* _target);
+
     Vector2D Wander();
+    void NewWanderTarget();
+
     Vector2D ObstacleAvoidance();
 };
