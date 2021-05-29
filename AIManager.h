@@ -5,6 +5,9 @@
 #include <directxcolors.h>
 #include <DirectXCollision.h>
 #include <vector>
+#include "imgui/imgui.h"
+#include "main.h"
+#include "Debug.h"
 
 using namespace std;
 

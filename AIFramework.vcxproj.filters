@@ -81,6 +81,7 @@
       <Filter>ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="Steering.h" />
+    <ClInclude Include="Constants.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\blue.dds">

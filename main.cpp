@@ -630,12 +630,6 @@ void Update(const float deltaTime)
 //--------------------------------------------------------------------------------------
 void Render()
 {
-    //imgui
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-    g_AIManager.DrawUI();
-
     // Update our time
     static float deltaTime = 0.0f;
     static ULONGLONG timeStart = 0;
@@ -643,7 +637,19 @@ void Render()
     if( timeStart == 0 )
         timeStart = timeCur;
     deltaTime = ( timeCur - timeStart ) / 1000.0f;
+
+    if (deltaTime < FPS_60/2)
+	{
+		return;
+	}
+
 	timeStart = timeCur;
+
+    //imgui
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    g_AIManager.DrawUI();
 
     Update(deltaTime);
     

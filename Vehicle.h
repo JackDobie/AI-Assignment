@@ -1,8 +1,9 @@
 #pragma once
+#include <string>
 #include "DrawableGameObject.h"
 #include "imgui/imgui.h"
 #include "Vector2D.h"
-#include <string>
+#include "Constants.h"
 
 class Steering;
 
@@ -51,7 +52,7 @@ protected:
 	Vector2D _positionTo;
 	Vector2D _lastPosition;
 
-	Vector2D _wanderTarget;
+	Vector2D _wanderTarget = Vector2D();
 
 	Steering* _steering;
 

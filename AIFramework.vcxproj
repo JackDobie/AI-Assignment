@@ -382,6 +382,7 @@
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
     <ClInclude Include="Background.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="DrawableGameObject.h" />

@@ -4,13 +4,6 @@
 #include "PickupItem.h"
 #include "Waypoint.h"
 
-#include "main.h"
-
-#include "Debug.h"
-
-#include "imgui/imgui.h"
-
-
 HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 {
     // create a pickup item ----------------------------------------------
@@ -21,19 +14,14 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     if (FAILED(hr))
         return hr;
 
-    // create the vehicle ------------------------------------------------
-    float xPos = 0;
-    float yPos = 0;
-
-    m_pCar = new Vehicle("Car", Vector2D(xPos, yPos), 200.0f);
+    // create the vehicles ------------------------------------------------
+    m_pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
     hr = m_pCar->initMesh(pd3dDevice);
-    m_pCar->setPosition(XMFLOAT3(xPos, yPos, 0));
     if (FAILED(hr))
         return hr;
 
-    AICar = new Vehicle("AICar", Vector2D(xPos, yPos), 200.0f);
+    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice);
-    AICar->setPosition(XMFLOAT3(xPos, yPos, 0));
     m_pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;

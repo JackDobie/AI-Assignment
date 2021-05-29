@@ -9,13 +9,8 @@
 #include "DDSTextureLoader.h"
 #include "resource.h"
 #include <iostream>
-
 #include "DrawableGameObject.h"
 #include "structures.h"
-
+#include "Constants.h"
 
 void AddItemToDrawList(DrawableGameObject* object);
-
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
-#define WAYPOINT_RESOLUTION 20

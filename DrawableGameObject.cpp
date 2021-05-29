@@ -143,7 +143,6 @@ HRESULT DrawableGameObject::initMesh(ID3D11Device* pd3dDevice)
 	return hr;
 }
 
-
 void DrawableGameObject::setPosition(XMFLOAT3 position)
 {
 	m_position = position;

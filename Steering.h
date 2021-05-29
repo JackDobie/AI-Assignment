@@ -3,6 +3,7 @@
 #pragma warning (disable:4786)
 
 #include "Vector2D.h"
+#include "Constants.h"
 
 class Vehicle;
 
@@ -11,7 +12,7 @@ class Steering
 public:
     Steering(Vehicle* veh);
 
-    Vector2D CalculateForce();
+    Vector2D CalculateForce(float deltaTime);
     
     enum class BehaviourType
     {
@@ -43,8 +44,9 @@ private:
 
     Vector2D Arrive(Vector2D _target);
 
-    Vector2D Wander();
-    void NewWanderTarget();
+    /*Vector2D Wander();
+    void NewWanderTarget();*/
+    Vector2D Wander(float deltaTime);
 
     Vector2D ObstacleAvoidance();
 

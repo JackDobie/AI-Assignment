@@ -1,12 +1,13 @@
 #include "Steering.h"
 #include "Vehicle.h"
+#include "Debug.h"
 
 Steering::Steering(Vehicle* veh) : vehicle(veh)
 {
 	activeType = BehaviourType::none;
 }
 
-Vector2D Steering::CalculateForce()
+Vector2D Steering::CalculateForce(float deltaTime)
 {
 	Vector2D steeringForce;
 
@@ -22,7 +23,7 @@ Vector2D Steering::CalculateForce()
 		steeringForce = Arrive(vehicle->GetTarget()) * arriveWeight;
 		break;
 	case BehaviourType::wander:
-		steeringForce = Wander();
+		steeringForce = Wander(deltaTime);
 		break;
 	case BehaviourType::obstacle_avoidance:
 		steeringForce = ObstacleAvoidance();;
@@ -69,28 +70,42 @@ Vector2D Steering::Arrive(Vector2D _target)
 	return Vector2D();
 }
 
-Vector2D Steering::Wander()
+//Vector2D Steering::Wander()
+//{
+//	if (vehicle->GetPositionVector().Distance(vehicle->GetWanderTarget()) < 3.5f)
+//	{
+//		NewWanderTarget();
+//	}
+//
+//	Vector2D seekWander = Seek(vehicle->GetWanderTarget());
+//	return seekWander;
+//}
+//void Steering::NewWanderTarget()
+//{
+//	//get random vector2d by width and height of screen
+//	Vector2D randTarget = Vector2D(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
+//
+//	randTarget.x -= SCREEN_WIDTH / 2;
+//	randTarget.y -= SCREEN_HEIGHT / 2;
+//
+//	vehicle->SetWanderTarget(randTarget);
+//}
+
+Vector2D Steering::Wander(float deltaTime)
 {
-	if (vehicle->GetPositionVector().Distance(vehicle->GetWanderTarget()) < 3.5f)
-	{
-		NewWanderTarget();
-	}
+	float jitter = 60.0f * deltaTime;
 
-	Vector2D seekWander = Seek(vehicle->GetWanderTarget());
-	return seekWander;
-}
-void Steering::NewWanderTarget()
-{
-	int width = 1024;
-	int height = 768;
-
-	//get random vector2d by width and height of screen
-	Vector2D randTarget = Vector2D(rand() % width, rand() % height);
-
-	randTarget.x -= width / 2;
-	randTarget.y -= height / 2;
-
-	vehicle->SetWanderTarget(randTarget);
+	Vector2D wanderTarget = vehicle->GetWanderTarget();
+	//add a small random vector to the target position
+	wanderTarget += Vector2D(((rand()) / (RAND_MAX + 1.0)) - ((rand()) / (RAND_MAX + 1.0)) * jitter,
+							((rand()) / (RAND_MAX + 1.0)) - ((rand()) / (RAND_MAX + 1.0)) * jitter);
+	wanderTarget.Normalize();
+	//update the wander target
+	vehicle->SetWanderTarget(wanderTarget);
+	//use wandertarget as an offset from position
+	Vector2D target = wanderTarget + vehicle->GetPositionVector();
+	//move towards target
+	return Seek(target);
 }
 
 Vector2D Steering::ObstacleAvoidance()
