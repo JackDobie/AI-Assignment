@@ -101,36 +101,17 @@ void Vehicle::DrawUI()
 	ImGui::SliderFloat("Max Speed", &_maxSpeed, 0.0f, 400.0f);
 
 	ImGui::Text("\nSteering Type:");
-	int e = (int)_steering->activeType;
-	if (ImGui::RadioButton("None", &e, 0))
-	{
-		_steering->activeType = Steering::BehaviourType::none;
+	int* type = (int*)&_steering->activeType;
+
+	if (ImGui::RadioButton("None", type, 0))
 		_velocity.Zero();
-	}
-	if(ImGui::RadioButton("Seek", &e, 1))
-	{
-		_steering->activeType = Steering::BehaviourType::seek;
-	}
-	if(ImGui::RadioButton("Flee", &e, 2))
-	{
-		_steering->activeType = Steering::BehaviourType::flee;
-	}
-	if(ImGui::RadioButton("Arrive", &e, 3))
-	{
-		_steering->activeType = Steering::BehaviourType::arrive;
-	}
-	if (ImGui::RadioButton("Wander", &e, 4))
-	{
-		_steering->activeType = Steering::BehaviourType::wander;
-	}
-	if(ImGui::RadioButton("Obstacle Avoidance", &e, 5))
-	{
-		_steering->activeType = Steering::BehaviourType::obstacle_avoidance;
-	}
-	if(ImGui::RadioButton("Pursuit", &e, 6))
-	{
-		_steering->activeType = Steering::BehaviourType::pursuit;
-	}
+
+	ImGui::RadioButton("Seek", type, 1);
+	ImGui::RadioButton("Flee", type, 2);
+	ImGui::RadioButton("Arrive", type, 3);
+	ImGui::RadioButton("Wander", type, 4);
+	ImGui::RadioButton("Obstacle Avoidance", type, 5);
+	ImGui::RadioButton("Pursuit", type, 6);
 
 	if (ImGui::Button("Reset"))
 	{
