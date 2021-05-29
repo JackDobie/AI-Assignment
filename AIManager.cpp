@@ -25,19 +25,18 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float xPos = 0;
     float yPos = 0;
 
-    m_pCar = new Vehicle("Car", Vector2D(xPos, yPos), 100.0f);
+    m_pCar = new Vehicle("Car", Vector2D(xPos, yPos), 200.0f);
     hr = m_pCar->initMesh(pd3dDevice);
     m_pCar->setPosition(XMFLOAT3(xPos, yPos, 0));
     if (FAILED(hr))
         return hr;
-    vehicles.push_back(m_pCar);
 
-    AICar = new Vehicle("AICar", Vector2D(xPos, yPos), 100.0f);
+    AICar = new Vehicle("AICar", Vector2D(xPos, yPos), 200.0f);
     hr = AICar->initMesh(pd3dDevice);
     AICar->setPosition(XMFLOAT3(xPos, yPos, 0));
+    m_pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
-    vehicles.push_back(AICar);
 
     // create the waypoints
     float xGap = SCREEN_WIDTH / WAYPOINT_RESOLUTION;
@@ -230,8 +229,5 @@ void AIManager::DrawUI()
     ImGui::Text("Hello world!");
     ImGui::End();
 
-    for (Vehicle* v : vehicles)
-    {
-        v->DrawUI();
-    }
+    m_pCar->DrawUI();
 }

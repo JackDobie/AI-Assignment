@@ -2,6 +2,7 @@
 #include "DrawableGameObject.h"
 #include "imgui/imgui.h"
 #include "Vector2D.h"
+#include <string>
 
 class Steering;
 
@@ -30,6 +31,11 @@ public:
 	void SetWanderTarget(Vector2D newTarget) { _wanderTarget = newTarget; }
 
 	void DrawUI();
+
+	Vehicle* GetOtherVehicle() { return _otherVehicle; }
+	void SetOtherVehicle(Vehicle* otherVeh) { _otherVehicle = otherVeh; }
+
+	Vector2D GetForward() { return _forward; }
 protected:
 	std::string _name;
 
@@ -37,6 +43,8 @@ protected:
 	float _currentSpeed;
 
 	Vector2D _velocity;
+
+	Vector2D _forward;
 
 	Vector2D _currentPosition;
 	Vector2D _startPosition;
@@ -46,5 +54,8 @@ protected:
 	Vector2D _wanderTarget;
 
 	Steering* _steering;
+
+	// the vehicle to persue
+	Vehicle* _otherVehicle = nullptr;
 };
 

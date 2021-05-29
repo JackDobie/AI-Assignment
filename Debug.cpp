@@ -24,6 +24,13 @@ void Debug::Print(DirectX::XMFLOAT3 output)
 	std::string out = "X:" + x + ", Y:" + y + ", Z:" + z + "\n";
 	OutputDebugStringA(out.c_str());
 }
+void Debug::Print(Vector2D output)
+{
+	std::string x = std::to_string(output.x);
+	std::string y = std::to_string(output.y);
+	std::string out = "X:" + x + ", Y:" + y + "\n";
+	OutputDebugStringA(out.c_str());
+}
 void Debug::Print(std::string str, DirectX::XMFLOAT3 output)
 {
 	std::string x = std::to_string(output.x);

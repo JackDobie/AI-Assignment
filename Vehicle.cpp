@@ -6,7 +6,6 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	SetVehiclePosition(startPos);
 	_steering = new Steering(this);
 	_currentSpeed = _maxSpeed;
-	SetVehiclePosition(Vector2D(0, 0));
 	_lastPosition = startPos;
 }
 
@@ -17,7 +16,6 @@ HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice)
 
 	HRESULT hr = DrawableGameObject::initMesh(pd3dDevice);
 
-
 	return hr;
 }
 
@@ -26,27 +24,12 @@ void Vehicle::Update(const float deltaTime)
 	//calculate acceleration based on steering force
 	Vector2D acceleration = _steering->CalculateForce();
 	//add acceleration to velocity
-	_velocity += acceleration * deltaTime; //TODO: deltatime
+	_velocity += acceleration * deltaTime;
 	//stops velocity from exceeding max speed
 	_velocity.Truncate(_maxSpeed);
+	_currentSpeed = _velocity.Length();
 	//add to position with velocity
-	_currentPosition += _velocity * deltaTime; //TODO: deltatime
-
-	//// consider replacing with force based acceleration / velocity calculations
-	//Vector2D vecTo = _positionTo - _currentPosition;
-	//float velocity = deltaTime * _currentSpeed;
-
-	//float length = (float)vecTo.Length();
-	//// if the distance to the end point is less than the car would move, then only move that distance.
-	//if (length > 0) {
-	//	vecTo.Normalize();
-	//	if(length > velocity)
-	//		vecTo *= velocity;
-	//	else
-	//		vecTo *= length;
-
-	//	_currentPosition += vecTo;
-	//}
+	_currentPosition += _velocity * deltaTime;
 
 	// rotate the object based on its last & current position
 	Vector2D diff = _currentPosition - _lastPosition;
@@ -55,6 +38,8 @@ void Vehicle::Update(const float deltaTime)
 		m_radianRotation = atan2f(diff.y, diff.x); // this is used by DrawableGameObject to set the rotation
 	}
 	_lastPosition = _currentPosition;
+
+	_forward = Vec2DNormalize(_velocity);
 
 	// set the current poistion for the drawablegameobject
 	setPosition(XMFLOAT3((float)_currentPosition.x, (float)_currentPosition.y, 0));
@@ -89,7 +74,14 @@ void Vehicle::SetVehiclePosition(Vector2D position)
 void Vehicle::DrawUI()
 {
 	ImGui::Begin((_name + " details").c_str());
-	ImGui::Text("Position: ", _currentPosition.x, _currentPosition.y);
+	ImGui::Text(("Position:\nX: " + to_string(_currentPosition.x) + ", Y: " + to_string(_currentPosition.y)).c_str());
+	ImGui::Text(("Current Speed: " + to_string(_currentSpeed)).c_str());
+	ImGui::SliderFloat("Max Speed", &_maxSpeed, 0.0f, 400.0f);
+
+	if (_steering->activeType == Steering::BehaviourType::wander)
+	{
+		ImGui::Text(("Wander target:\nX: " + to_string(_wanderTarget.x) + ", Y: " + to_string(_wanderTarget.y)).c_str());
+	}
 
 	ImGui::Text("\nSteering Type:");
 	int e = (int)_steering->activeType;
@@ -112,7 +104,6 @@ void Vehicle::DrawUI()
 	if (ImGui::RadioButton("Wander", &e, 4))
 	{
 		_steering->activeType = Steering::BehaviourType::wander;
-		ImGui::Text("Wander target: ", _wanderTarget.x, _wanderTarget.y);
 	}
 	if(ImGui::RadioButton("Obstacle Avoidance", &e, 5))
 	{

@@ -39,6 +39,5 @@ private:
 	vecPickups              m_pickups;
 	Vehicle*				m_pCar = nullptr;
 	Vehicle*				AICar = nullptr;
-	vector<Vehicle*>			vehicles;
 };
 
