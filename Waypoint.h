@@ -8,7 +8,8 @@ public:
 
     bool isOnTrack() { return m_isOnTrack; }
     void setVisible(const bool visible) { m_visible = visible; }
-    bool isVisible() {return m_visible;}
+    bool isVisible() { return m_visible; }
+    bool isCheckpoint() { return m_isCheckpoint; }
 
 private:
     bool m_isOnTrack;

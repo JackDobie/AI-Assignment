@@ -42,9 +42,13 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
             m_waypoints.push_back(wp);
 
             if (wp->isOnTrack())
-                pPickup->placeablePositions.push_back(wp->GetPositionVector());
+            {
+                if(wp->isCheckpoint())
+                    pPickup->placeablePositions.push_back(wp->GetPositionVector());
+            }
         }
     }
+    pPickup->GetNewPosition();
 
     return hr;
 }
@@ -68,8 +72,11 @@ void AIManager::update(const float fDeltaTime)
     {
         if (w->isOnTrack())
         {
-            w->update(fDeltaTime);
-            AddItemToDrawList(w);
+            if (w->GetPositionVector() != pPickup->GetPositionVector())
+            {
+                w->update(fDeltaTime);
+                AddItemToDrawList(w);
+            }
         }
     }
 

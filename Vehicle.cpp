@@ -109,7 +109,7 @@ void Vehicle::DrawUI()
 	ImGui::Text("Position:\nX: %.3f, Y: %.3f", _currentPosition.x, _currentPosition.y);
 	if (_steering->activeType == Steering::BehaviourType::wander)
 	{
-		ImGui::Text("Wander target:\nX: %.3f, Y: %.3f", _wanderTarget.x);
+		ImGui::Text("Wander target:\nX: %.3f, Y: %.3f", _wanderTarget.x, _wanderTarget.y);
 	}
 
 	ImGui::Text("Current Speed: %.3f", _currentSpeed);
