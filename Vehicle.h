@@ -37,6 +37,8 @@ public:
 	void SetOtherVehicle(Vehicle* otherVeh) { _otherVehicle = otherVeh; }
 
 	Vector2D GetForward() { return _forward; }
+
+	void Boost();
 protected:
 	std::string _name;
 
@@ -58,5 +60,8 @@ protected:
 
 	// the vehicle to persue
 	Vehicle* _otherVehicle = nullptr;
+
+	float _speedFactor;
+	float _speedBoostTimer;
 };
 

@@ -64,6 +64,7 @@ Vector2D Steering::Arrive(Vector2D _target)
 		//ensure speed does not exceed max speed
 		speed = min(speed, vehicle->GetMaxSpeed());
 		Vector2D desiredVelocity = dir * speed / dist;
+		Debug::Print(desiredVelocity);
 		return (desiredVelocity - vehicle->GetVelocity());
 	}
 	//if distance is less than or equal to 0, do not return a force

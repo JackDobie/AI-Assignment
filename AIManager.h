@@ -18,7 +18,6 @@ class Waypoint;
 
 typedef vector<DrawableGameObject*> vecDrawables;
 typedef vector<Waypoint*> vecWaypoints;
-typedef vector<PickupItem*> vecPickups;
 
 class AIManager
 {
@@ -39,7 +38,7 @@ protected:
 
 private:
 	vecWaypoints            m_waypoints;
-	vecPickups              m_pickups;
+	PickupItem*				pPickup;
 	Vehicle*				m_pCar = nullptr;
 	Vehicle*				AICar = nullptr;
 };

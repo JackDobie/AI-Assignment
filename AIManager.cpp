@@ -8,9 +8,8 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 {
     // create a pickup item ----------------------------------------------
 
-    PickupItem* pPickup = new PickupItem();
+    pPickup = new PickupItem();
     HRESULT hr = pPickup->initMesh(pd3dDevice);
-    m_pickups.push_back(pPickup);
     if (FAILED(hr))
         return hr;
 
@@ -41,6 +40,9 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
             hr = wp->initMesh(pd3dDevice, index++);
             wp->setPosition(XMFLOAT3(xStart + (xGap * i), yStart + (yGap * j), 0));
             m_waypoints.push_back(wp);
+
+            if (wp->isOnTrack())
+                pPickup->placeablePositions.push_back(wp->GetPositionVector());
         }
     }
 
@@ -49,12 +51,12 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 
 void AIManager::update(const float fDeltaTime)
 {
-    Waypoint* w = GetWaypoint(5, 1);
+    /*Waypoint* w = GetWaypoint(5, 1);
     if (w != nullptr)
     {
         w->update(fDeltaTime);
         AddItemToDrawList(w);
-    }
+    }*/
 
     //for (unsigned int i = 0; i < m_waypoints.size(); i++)
     //{
@@ -62,11 +64,17 @@ void AIManager::update(const float fDeltaTime)
     //    //AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
     //}
 
-    for (unsigned int i = 0; i < m_pickups.size(); i++)
+    for (Waypoint* w : m_waypoints)
     {
-        m_pickups[i]->update(fDeltaTime);
-        AddItemToDrawList(m_pickups[i]);
+        if (w->isOnTrack())
+        {
+            w->update(fDeltaTime);
+            AddItemToDrawList(w);
+        }
     }
+
+    pPickup->update(fDeltaTime);
+    AddItemToDrawList(pPickup);
 
     m_pCar->Update(fDeltaTime);
     AICar->Update(fDeltaTime);
@@ -108,8 +116,6 @@ void AIManager::keyPress(WPARAM param)
 
 bool AIManager::checkForCollisions()
 {
-    if (m_pickups.size() == 0)
-        return false;
 
     XMVECTOR dummy;
 
@@ -129,14 +135,14 @@ bool AIManager::checkForCollisions()
     XMStoreFloat3(&boundingSphereCar.Center, carPos);
     boundingSphereCar.Radius = scale.x;
 
-    // a pickup - !! NOTE it is only referring the first one in the list !!
+    // check for collision with pickups
     XMVECTOR puPos;
     XMVECTOR puScale;
     XMMatrixDecompose(
         &puScale,
         &dummy,
         &puPos,
-        XMLoadFloat4x4(m_pickups[0]->getTransform())
+        XMLoadFloat4x4(pPickup->getTransform())
     );
 
     XMStoreFloat3(&scale, puScale);
@@ -144,10 +150,12 @@ bool AIManager::checkForCollisions()
     XMStoreFloat3(&boundingSpherePU.Center, puPos);
     boundingSpherePU.Radius = scale.x;
 
-    // test
+    // if the two bounding spheres collide
     if (boundingSphereCar.Intersects(boundingSpherePU))
     {
-        OutputDebugStringA("Collision!\n");
+        Debug::Print("Collision");
+        pPickup->Collide();
+        m_pCar->Boost();
         return true;
     }
 
@@ -214,7 +222,7 @@ vector<Waypoint*> AIManager::GetNeighbours(int x, int y)
 void AIManager::DrawUI()
 {
     ImGui::Begin("Control window");
-    ImGui::Text("Hello world!");
+    ImGui::Text((to_string(pPickup->GetPositionVector().x) + " " + to_string(pPickup->GetPositionVector().y)).c_str());
     ImGui::End();
 
     m_pCar->DrawUI();
