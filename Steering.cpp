@@ -116,49 +116,45 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
 
 	Vector2D vehPos = vehicle->GetPositionVector();
+	Vehicle* otherVeh = vehicle->GetOtherVehicle();
 
-	Waypoint* closestObstacle = nullptr;
+	Vehicle* closestObstacle = nullptr;
 	float closestObstacleDist = D3D11_FLOAT32_MAX;
 	Vector2D closestObstacleLocalPos = Vector2D();
 
-	float aRadius = 30.0f;
-	float bRadius = 30.0f;
+	float aRadius = 30.0f * 1.2f;
+	float bRadius = 30.0f * 1.2f;
 
-	for (Waypoint* w : offTrackPoints)
+	Vector2D otherPos = otherVeh->GetPositionVector();
+
+	Vector2D localPos;
+	localPos.x = (vehicle->GetForward().x * otherPos.x) + (vehicle->GetForward().y * otherPos.y) + (-vehPos.Dot(vehicle->GetForward()));
+	localPos.y = (vehicle->GetSide().x * otherPos.x) + (vehicle->GetSide().y * otherPos.y) + (-vehPos.Dot(vehicle->GetSide()));
+
+	float expandedRadius = aRadius + bRadius;
+
+	//if local position has a negative x then it must be behind the vehicle, and can be ignored
+	if (localPos.x >= 0.0f)
 	{
-		Vector2D otherPos = w->GetPositionVector();
-
-		Vector2D localPos;
-		localPos.x = (vehicle->GetForward().x * otherPos.x) + (vehicle->GetForward().y * otherPos.y) + (-vehPos.Dot(vehicle->GetForward()));
-		localPos.y = (vehicle->GetSide().x * otherPos.x) + (vehicle->GetSide().y * otherPos.y) + (-vehPos.Dot(vehicle->GetSide()));
-
-		float expandedRadius = aRadius + bRadius;
-
-		//if local position has a negative x then it must be behind the vehicle, and can be ignored
-		if (localPos.x >= 0.0f)
+		if (fabs(localPos.y) < expandedRadius)
 		{
-			if (fabs(localPos.y) < expandedRadius)
+			if (localPos.LengthSq() < expandedRadius * expandedRadius)
 			{
-				if (localPos.LengthSq() < expandedRadius * expandedRadius)
+				float sqrPart = sqrt(expandedRadius * expandedRadius - localPos.y * localPos.y);
+
+				float ip = localPos.x - sqrPart;
+
+				if (ip <= 0.0)
 				{
-					float sqrPart = sqrt(expandedRadius * expandedRadius - localPos.y * localPos.y);
+					ip += localPos.x + sqrPart;
+				}
 
-					float ip = localPos.x - sqrPart;
-
-					if (ip <= 0.0)
-					{
-						ip += localPos.x + sqrPart;
-					}
-
-					// find the closest obstacle to steer away from
-					if (ip < closestObstacleDist)
-					{
-						closestObstacleDist = ip;
-						closestObstacle = w;
-						closestObstacleLocalPos = localPos;
-
-						w->draw = true;
-					}
+				// find the closest obstacle to steer away from
+				if (ip < closestObstacleDist)
+				{
+					closestObstacleDist = ip;
+					closestObstacle = otherVeh;
+					closestObstacleLocalPos = localPos;
 				}
 			}
 		}
@@ -183,29 +179,10 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 		return out;
 	}
 
-	//Vector2D dif = wPos - vehPos;
-	//if (dif.Length() <= detectionBoxLength)
-	//{
-	//	// find the angle between the vehicle and waypoint using atan2
-	//	double dot = vehicle->GetForward().Dot(wPos);
-	//	double det = vehicle->GetForward().x * wPos.y - vehicle->GetForward().y * wPos.x;
-	//	float angle = atan2(det, dot);
-
-	//	if (angle > -0.01f && angle < 0.01f)
-	//	{
-	//		// potential collision?
-	//		w->draw = true;
-	//		Debug::Print(angle);
-	//	}
-	//}
-	//else
-	//{
-	//	w->draw = false;
-	//}
-
-	//return Seek(_target);
+	// seek to the mouse click when not colliding
+	return Seek(_target);
 	//// no waypoints collided with. return nothing.
-	return Vector2D();
+	//return Vector2D();
 }
 
 Vector2D Steering::Pursuit(Vehicle* _target)
