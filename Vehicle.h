@@ -40,8 +40,9 @@ protected:
 	StateMachine* _stateMachine;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
-
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
+	void InitStateMachine(State* startState);
+
 	virtual void Update(float deltaTime);
 
 	Vector2D GetCurrentPosition() { return _currentPosition; }

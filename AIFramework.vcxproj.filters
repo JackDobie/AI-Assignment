@@ -37,6 +37,7 @@
     </ClCompile>
     <ClCompile Include="Steering.cpp" />
     <ClCompile Include="StateMachine.cpp" />
+    <ClCompile Include="PathfindingState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -86,6 +87,7 @@
     <ClInclude Include="StateMachine.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="SteeringState.h" />
+    <ClInclude Include="PathfindingState.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\blue.dds">

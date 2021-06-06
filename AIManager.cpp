@@ -18,12 +18,18 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     hr = pCar->initMesh(pd3dDevice, L"Resources\\car_blue.dds");
     if (FAILED(hr))
         return hr;
+    _steeringState = new SteeringState(pCar);
+    _pathfindingState = new PathfindingState(pCar);
+    pCar->InitStateMachine(_steeringState);
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
     pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
+    
+    _AIPathfindingState = new PathfindingState(AICar);
+    AICar->InitStateMachine(_AIPathfindingState);
 
     // create the waypoints
     float xGap = SCREEN_WIDTH / WAYPOINT_RESOLUTION;
@@ -235,7 +241,17 @@ vector<Waypoint*> AIManager::GetNeighbours(int x, int y)
 void AIManager::DrawUI()
 {
     ImGui::Begin("Control window");
-    ImGui::Text((to_string(pPickup->GetPositionVector().x) + " " + to_string(pPickup->GetPositionVector().y)).c_str());
+    
+    static int radioctrl = 0;
+    if (ImGui::RadioButton("Steering", &radioctrl, 0))
+    {
+        pCar->GetStateMachine()->ChangeState(_steeringState);
+    }
+    if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
+    {
+        pCar->GetStateMachine()->ChangeState(_pathfindingState);
+    }
+
     ImGui::End();
 
     pCar->GetStateMachine()->DrawUI();

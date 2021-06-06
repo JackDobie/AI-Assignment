@@ -1,6 +1,5 @@
 #include "Vehicle.h"
 #include "Steering.h"
-#include "SteeringState.h"
 
 Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(name), _startPosition(startPos), _maxSpeed(maxSpeed)
 {
@@ -9,9 +8,6 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	_currentSpeed = _maxSpeed;
 	_lastPosition = startPos;
 	_speedFactor = 1.0f;
-
-	SteeringState* _steeringState = new SteeringState(this);
-	_stateMachine = new StateMachine(_steeringState);
 }
 
 HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
@@ -22,6 +18,12 @@ HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
 	HRESULT hr = DrawableGameObject::initMesh(pd3dDevice);
 
 	return hr;
+}
+
+void Vehicle::InitStateMachine(State* startState)
+{
+	if (startState != nullptr)
+		_stateMachine = new StateMachine(startState);
 }
 
 void Vehicle::Update(float deltaTime)

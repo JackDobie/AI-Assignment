@@ -8,6 +8,8 @@
 #include "imgui/imgui.h"
 #include "main.h"
 #include "Debug.h"
+#include "SteeringState.h"
+#include "PathfindingState.h"
 
 using namespace std;
 
@@ -23,25 +25,27 @@ class AIManager
 {
 public:
 
-	HRESULT initialise(ID3D11Device* pd3dDevice);
-	void	update(const float fDeltaTime);
-	void	mouseUp(int x, int y);
-	void	keyPress(WPARAM param);
+	HRESULT					initialise(ID3D11Device* pd3dDevice);
+	void					update(const float fDeltaTime);
+	void					mouseUp(int x, int y);
+	void					keyPress(WPARAM param);
 
-	Waypoint* GetWaypoint(int x, int y);
-	vector<Waypoint*> GetNeighbours(int x, int y);
+	Waypoint*				GetWaypoint(int x, int y);
+	vector<Waypoint*>		GetNeighbours(int x, int y);
 
 	void DrawUI();
-
-protected:
-	bool	checkForCollisions();
-
 private:
+	bool					checkForCollisions();
+
 	vecWaypoints            m_waypoints;
 	PickupItem*				pPickup;
 	Vehicle*				pCar = nullptr;
 	Vehicle*				AICar = nullptr;
 
 	bool					displayWaypoints = false;
+
+	SteeringState*			_steeringState;
+	PathfindingState*		_pathfindingState;
+	PathfindingState*		_AIPathfindingState;
 };
 
