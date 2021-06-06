@@ -26,7 +26,7 @@ Vector2D Steering::CalculateForce(float deltaTime)
 		steeringForce = Wander(deltaTime);
 		break;
 	case BehaviourType::obstacle_avoidance:
-		steeringForce = ObstacleAvoidance();;
+		steeringForce = ObstacleAvoidance(vehicle->GetTarget()) * obstacleAvoidWeight;
 		break;
 	case BehaviourType::pursuit:
 		steeringForce = Pursuit(vehicle->GetOtherVehicle());
@@ -109,8 +109,102 @@ Vector2D Steering::Wander(float deltaTime)
 	return Seek(target);
 }
 
-Vector2D Steering::ObstacleAvoidance()
+Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 {
+	// creates a box in front of the vehicle to detect obstacles
+	float minDetectionBoxLength = 30.0f;
+	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
+
+	Vector2D vehPos = vehicle->GetPositionVector();
+
+	Waypoint* closestObstacle = nullptr;
+	float closestObstacleDist = D3D11_FLOAT32_MAX;
+	Vector2D closestObstacleLocalPos = Vector2D();
+
+	float aRadius = 30.0f;
+	float bRadius = 30.0f;
+
+	for (Waypoint* w : offTrackPoints)
+	{
+		Vector2D otherPos = w->GetPositionVector();
+
+		Vector2D localPos;
+		localPos.x = (vehicle->GetForward().x * otherPos.x) + (vehicle->GetForward().y * otherPos.y) + (-vehPos.Dot(vehicle->GetForward()));
+		localPos.y = (vehicle->GetSide().x * otherPos.x) + (vehicle->GetSide().y * otherPos.y) + (-vehPos.Dot(vehicle->GetSide()));
+
+		float expandedRadius = aRadius + bRadius;
+
+		//if local position has a negative x then it must be behind the vehicle, and can be ignored
+		if (localPos.x >= 0.0f)
+		{
+			if (fabs(localPos.y) < expandedRadius)
+			{
+				if (localPos.LengthSq() < expandedRadius * expandedRadius)
+				{
+					float sqrPart = sqrt(expandedRadius * expandedRadius - localPos.y * localPos.y);
+
+					float ip = localPos.x - sqrPart;
+
+					if (ip <= 0.0)
+					{
+						ip += localPos.x + sqrPart;
+					}
+
+					// find the closest obstacle to steer away from
+					if (ip < closestObstacleDist)
+					{
+						closestObstacleDist = ip;
+						closestObstacle = w;
+						closestObstacleLocalPos = localPos;
+
+						w->draw = true;
+					}
+				}
+			}
+		}
+	}
+	if (closestObstacle != nullptr)
+	{
+		Vector2D steeringForce = Vector2D();
+
+		double multiplier = 1.0 + (detectionBoxLength - closestObstacleLocalPos.x) / detectionBoxLength;
+
+		steeringForce.y = bRadius - closestObstacleLocalPos.y * multiplier;
+
+		double brakeWeight = 0.2;
+
+		steeringForce.x = (bRadius - closestObstacleLocalPos.x) * brakeWeight;
+
+		Vector2D out;
+		out.x = (vehicle->GetForward().x * steeringForce.x) + (vehicle->GetSide().x * steeringForce.y);
+		out.y = (vehicle->GetForward().y * steeringForce.x) + (vehicle->GetSide().y * steeringForce.y);
+
+		// if there is no steering force, do not return and go to the next waypoint
+		return out;
+	}
+
+	//Vector2D dif = wPos - vehPos;
+	//if (dif.Length() <= detectionBoxLength)
+	//{
+	//	// find the angle between the vehicle and waypoint using atan2
+	//	double dot = vehicle->GetForward().Dot(wPos);
+	//	double det = vehicle->GetForward().x * wPos.y - vehicle->GetForward().y * wPos.x;
+	//	float angle = atan2(det, dot);
+
+	//	if (angle > -0.01f && angle < 0.01f)
+	//	{
+	//		// potential collision?
+	//		w->draw = true;
+	//		Debug::Print(angle);
+	//	}
+	//}
+	//else
+	//{
+	//	w->draw = false;
+	//}
+
+	//return Seek(_target);
+	//// no waypoints collided with. return nothing.
 	return Vector2D();
 }
 

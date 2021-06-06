@@ -11,6 +11,8 @@ public:
     bool isVisible() { return m_visible; }
     bool isCheckpoint() { return m_isCheckpoint; }
 
+    bool draw;
+
 private:
     bool m_isOnTrack;
     bool m_isCheckpoint;

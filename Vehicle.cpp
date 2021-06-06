@@ -56,7 +56,8 @@ void Vehicle::Update(const float deltaTime)
 	}
 	_lastPosition = _currentPosition;
 
-	_forward = Vec2DNormalize(_velocity);
+	_forward = Vector2D(cosf(m_radianRotation), sinf(m_radianRotation));
+	_side = _forward.Perp();
 
 	//loop around screen
 	int Wmin = (SCREEN_WIDTH * 0.5f) - SCREEN_WIDTH;

@@ -21,13 +21,6 @@ void PickupItem::Collide()
 	GetNewPosition();
 }
 
-void PickupItem::Hide()
-{
-	pos.x = SCREEN_WIDTH + 100.0f;
-	pos.y = SCREEN_HEIGHT + 100.0f;
-	setPosition(XMFLOAT3(pos.x, pos.y, 0.0f));
-}
-
 void PickupItem::GetNewPosition()
 {
 	int index = rand() % placeablePositions.size();

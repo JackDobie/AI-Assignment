@@ -14,14 +14,14 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
         return hr;
 
     // create the vehicles ------------------------------------------------
-    m_pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
-    hr = m_pCar->initMesh(pd3dDevice);
+    pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
+    hr = pCar->initMesh(pd3dDevice);
     if (FAILED(hr))
         return hr;
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice);
-    m_pCar->SetOtherVehicle(AICar);
+    pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
 
@@ -31,6 +31,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float xStart = -(SCREEN_WIDTH / 2) + (xGap / 2);
     float yStart = -(SCREEN_HEIGHT / 2) + (yGap / 2);
 
+    vector<Waypoint*> offTrackPoints;
     unsigned int index = 0;
     for (unsigned int j = 0; j < WAYPOINT_RESOLUTION; j++)
     {
@@ -46,9 +47,14 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
                 if(wp->isCheckpoint())
                     pPickup->placeablePositions.push_back(wp->GetPositionVector());
             }
+            else
+            {
+                offTrackPoints.push_back(wp);
+            }
         }
     }
     pPickup->GetNewPosition();
+    pCar->SetOffTrackPoints(offTrackPoints);
 
     return hr;
 }
@@ -70,31 +76,36 @@ void AIManager::update(const float fDeltaTime)
 
     for (Waypoint* w : m_waypoints)
     {
-        if (w->isOnTrack())
+        /*if (w->isOnTrack())
         {
             if (w->GetPositionVector() != pPickup->GetPositionVector())
             {
                 w->update(fDeltaTime);
                 AddItemToDrawList(w);
             }
+        }*/
+        if (w->draw)
+        {
+            w->update(fDeltaTime);
+            AddItemToDrawList(w);
         }
     }
 
     pPickup->update(fDeltaTime);
     AddItemToDrawList(pPickup);
 
-    m_pCar->Update(fDeltaTime);
+    pCar->Update(fDeltaTime);
     AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
-    AddItemToDrawList(m_pCar);
+    AddItemToDrawList(pCar);
     AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)
 {
-    m_pCar->SetPositionTo(Vector2D(x, y));
+    pCar->SetPositionTo(Vector2D(x, y));
 }
 
 void AIManager::keyPress(WPARAM param)
@@ -133,7 +144,7 @@ bool AIManager::checkForCollisions()
         &carScale,
         &dummy,
         &carPos,
-        XMLoadFloat4x4(m_pCar->getTransform())
+        XMLoadFloat4x4(pCar->getTransform())
     );
 
     XMFLOAT3 scale;
@@ -162,7 +173,7 @@ bool AIManager::checkForCollisions()
     {
         Debug::Print("Collision");
         pPickup->Collide();
-        m_pCar->Boost();
+        pCar->Boost();
         return true;
     }
 
@@ -232,5 +243,5 @@ void AIManager::DrawUI()
     ImGui::Text((to_string(pPickup->GetPositionVector().x) + " " + to_string(pPickup->GetPositionVector().y)).c_str());
     ImGui::End();
 
-    m_pCar->DrawUI();
+    pCar->DrawUI();
 }

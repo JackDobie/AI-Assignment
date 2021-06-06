@@ -8,7 +8,6 @@ public:
     virtual HRESULT initMesh(ID3D11Device* pd3dDevice);
 
     void Collide();
-    void Hide();
     void GetNewPosition();
 
     std::vector<Vector2D> placeablePositions;

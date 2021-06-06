@@ -39,7 +39,7 @@ protected:
 private:
 	vecWaypoints            m_waypoints;
 	PickupItem*				pPickup;
-	Vehicle*				m_pCar = nullptr;
+	Vehicle*				pCar = nullptr;
 	Vehicle*				AICar = nullptr;
 };
 

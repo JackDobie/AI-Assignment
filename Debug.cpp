@@ -2,7 +2,7 @@
 
 void Debug::Print(std::string output)
 {
-	OutputDebugStringA(output.c_str());
+	OutputDebugStringA((output + "\n").c_str());
 }
 void Debug::Print(int output)
 {

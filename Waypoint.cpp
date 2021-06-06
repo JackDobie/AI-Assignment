@@ -21,6 +21,7 @@ HRESULT	Waypoint::initMesh(ID3D11Device* pd3dDevice, const int index)
 	m_visible = true;
 	m_isCheckpoint = false;
 	m_isOnTrack = false;
+	draw = false;
 
 	if (std::find(vecOffTrack400.begin(), vecOffTrack400.end(), index) == vecOffTrack400.end()) {
 		m_isOnTrack = true;

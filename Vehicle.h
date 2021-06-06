@@ -4,11 +4,37 @@
 #include "imgui/imgui.h"
 #include "Vector2D.h"
 #include "Constants.h"
+#include "Steering.h"
 
 class Steering;
 
 class Vehicle : public DrawableGameObject
 {
+protected:
+	std::string _name;
+
+	float _maxSpeed;
+	float _currentSpeed;
+
+	Vector2D _velocity;
+
+	Vector2D _forward;
+	Vector2D _side;
+
+	Vector2D _currentPosition;
+	Vector2D _startPosition;
+	Vector2D _positionTo;
+	Vector2D _lastPosition;
+
+	Vector2D _wanderTarget = Vector2D();
+
+	Steering* _steering;
+
+	// the vehicle to persue
+	Vehicle* _otherVehicle = nullptr;
+
+	float _speedFactor;
+	float _speedBoostTimer;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 
@@ -37,31 +63,12 @@ public:
 	void SetOtherVehicle(Vehicle* otherVeh) { _otherVehicle = otherVeh; }
 
 	Vector2D GetForward() { return _forward; }
+	Vector2D GetSide() { return _side; }
 
 	void Boost();
-protected:
-	std::string _name;
 
-	float _maxSpeed;
-	float _currentSpeed;
+	float GetSpeedFactor() { return _speedFactor; }
 
-	Vector2D _velocity;
-
-	Vector2D _forward;
-
-	Vector2D _currentPosition;
-	Vector2D _startPosition;
-	Vector2D _positionTo;
-	Vector2D _lastPosition;
-
-	Vector2D _wanderTarget = Vector2D();
-
-	Steering* _steering;
-
-	// the vehicle to persue
-	Vehicle* _otherVehicle = nullptr;
-
-	float _speedFactor;
-	float _speedBoostTimer;
+	void SetOffTrackPoints(vector<Waypoint*> v) { _steering->offTrackPoints = v; }
 };
 

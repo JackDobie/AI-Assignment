@@ -4,6 +4,9 @@
 
 #include "Vector2D.h"
 #include "Constants.h"
+#include <vector>
+#include "Waypoint.h"
+using namespace std;
 
 class Vehicle;
 
@@ -27,28 +30,28 @@ public:
 
     BehaviourType activeType;
 
-    float seekWeight = 5.0f;
-    float arriveWeight = 2.0f;
-    float fleeWeight = 10.0f;
-private:
-    // the vehicle using this steering
-	Vehicle* vehicle;
-
-    Vector2D target;
+    vector<Waypoint*> offTrackPoints;
 private:
     bool IsActive(BehaviourType type) { return (type == activeType); }
 
     Vector2D Seek(Vector2D _target);
+    float seekWeight = 10.0f;
 
     Vector2D Flee(Vector2D _target);
+    float fleeWeight = 20.0f;
 
     Vector2D Arrive(Vector2D _target);
+    float arriveWeight = 4.0f;
 
-    /*Vector2D Wander();
-    void NewWanderTarget();*/
     Vector2D Wander(float deltaTime);
 
-    Vector2D ObstacleAvoidance();
+    Vector2D ObstacleAvoidance(Vector2D _target);
+    float obstacleAvoidWeight = 25.0f;
 
     Vector2D Pursuit(Vehicle* _target);
+
+    // the vehicle using this steering
+    Vehicle* vehicle;
+
+    Vector2D target;
 };
