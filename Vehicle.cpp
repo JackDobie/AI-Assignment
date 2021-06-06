@@ -1,5 +1,6 @@
 #include "Vehicle.h"
 #include "Steering.h"
+#include "SteeringState.h"
 
 Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(name), _startPosition(startPos), _maxSpeed(maxSpeed)
 {
@@ -8,6 +9,9 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	_currentSpeed = _maxSpeed;
 	_lastPosition = startPos;
 	_speedFactor = 1.0f;
+
+	SteeringState* _steeringState = new SteeringState(this);
+	_stateMachine = new StateMachine(_steeringState);
 }
 
 HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
@@ -20,8 +24,10 @@ HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
 	return hr;
 }
 
-void Vehicle::Update(const float deltaTime)
+void Vehicle::Update(float deltaTime)
 {
+	_stateMachine->Update(deltaTime);
+
 	if (_speedFactor != 1.0f)
 	{
 		if (_speedBoostTimer > 0.0f)
@@ -104,48 +110,16 @@ void Vehicle::SetVehiclePosition(Vector2D position)
 	setPosition(XMFLOAT3((float)position.x, (float)position.y, 0));
 }
 
-void Vehicle::DrawUI()
-{
-	ImGui::Begin((_name + " details").c_str());
-	ImGui::Text("Position:\nX: %.3f, Y: %.3f", _currentPosition.x, _currentPosition.y);
-	if (_steering->activeType == Steering::BehaviourType::wander)
-	{
-		ImGui::Text("Wander target:\nX: %.3f, Y: %.3f", _wanderTarget.x, _wanderTarget.y);
-	}
-
-	ImGui::Text("Current Speed: %.3f", _currentSpeed);
-	ImGui::SliderFloat("Max Speed", &_maxSpeed, 0.0f, 400.0f);
-	if (_speedBoostTimer > 0.0f)
-	{
-		ImGui::Text("Speed boost! Time remaining: %.3f", _speedBoostTimer);
-	}
-
-	ImGui::Text("\nSteering Type:");
-	int* type = (int*)&_steering->activeType;
-
-	if (ImGui::RadioButton("None", type, 0))
-		_velocity.Zero();
-
-	ImGui::RadioButton("Seek", type, 1);
-	ImGui::RadioButton("Flee", type, 2);
-	ImGui::RadioButton("Arrive", type, 3);
-	ImGui::RadioButton("Wander", type, 4);
-	ImGui::RadioButton("Obstacle Avoidance", type, 5);
-	ImGui::RadioButton("Pursuit", type, 6);
-
-	if (ImGui::Button("Reset"))
-	{
-		SetVehiclePosition(_startPosition);
-		_velocity.Zero();
-		_steering->activeType = Steering::BehaviourType::none;
-		_speedFactor = 1.0f;
-	}
-
-	ImGui::End();
-}
-
 void Vehicle::Boost()
 {
 	_speedFactor = 1.2f;
 	_speedBoostTimer = 3.0f;
+}
+
+void Vehicle::Reset()
+{
+	SetVehiclePosition(_startPosition);
+	_velocity.Zero();
+	_steering->activeType = Steering::BehaviourType::none;
+	_speedFactor = 1.0f;
 }

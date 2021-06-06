@@ -167,7 +167,6 @@ bool AIManager::checkForCollisions()
     // if the two bounding spheres collide
     if (boundingSphereCar.Intersects(boundingSpherePU))
     {
-        Debug::Print("Collision");
         pPickup->Collide();
         pCar->Boost();
         return true;
@@ -239,5 +238,5 @@ void AIManager::DrawUI()
     ImGui::Text((to_string(pPickup->GetPositionVector().x) + " " + to_string(pPickup->GetPositionVector().y)).c_str());
     ImGui::End();
 
-    pCar->DrawUI();
+    pCar->GetStateMachine()->DrawUI();
 }

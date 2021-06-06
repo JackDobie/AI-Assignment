@@ -41,15 +41,15 @@ Vector2D Steering::CalculateForce(float deltaTime)
 Vector2D Steering::Seek(Vector2D _target)
 {
 	// returns a steering force that directs the vehicle towards the target
-	Vector2D desiredVelocity = Vec2DNormalize(_target - vehicle->GetPositionVector()) * vehicle->GetMaxSpeed();
-	return (desiredVelocity - vehicle->GetVelocity());
+	Vector2D desiredVelocity = Vec2DNormalize(_target - vehicle->GetPositionVector()) * *vehicle->GetMaxSpeed();
+	return (desiredVelocity - *vehicle->GetVelocity());
 }
 
 Vector2D Steering::Flee(Vector2D _target)
 {
 	//similar to seek but target and position are swapped
-	Vector2D desiredVelocity = Vec2DNormalize(vehicle->GetPositionVector() - _target) * vehicle->GetMaxSpeed();
-	return (desiredVelocity - vehicle->GetVelocity());
+	Vector2D desiredVelocity = Vec2DNormalize(vehicle->GetPositionVector() - _target) * *vehicle->GetMaxSpeed();
+	return (desiredVelocity - *vehicle->GetVelocity());
 }
 
 Vector2D Steering::Arrive(Vector2D _target)
@@ -62,35 +62,13 @@ Vector2D Steering::Arrive(Vector2D _target)
 		//decrease speed with distance
 		float speed = dist / 1.5f;
 		//ensure speed does not exceed max speed
-		speed = min(speed, vehicle->GetMaxSpeed());
+		speed = min(speed, *vehicle->GetMaxSpeed());
 		Vector2D desiredVelocity = dir * speed / dist;
-		Debug::Print(desiredVelocity);
-		return (desiredVelocity - vehicle->GetVelocity());
+		return (desiredVelocity - *vehicle->GetVelocity());
 	}
 	//if distance is less than or equal to 0, do not return a force
 	return Vector2D();
 }
-
-//Vector2D Steering::Wander()
-//{
-//	if (vehicle->GetPositionVector().Distance(vehicle->GetWanderTarget()) < 3.5f)
-//	{
-//		NewWanderTarget();
-//	}
-//
-//	Vector2D seekWander = Seek(vehicle->GetWanderTarget());
-//	return seekWander;
-//}
-//void Steering::NewWanderTarget()
-//{
-//	//get random vector2d by width and height of screen
-//	Vector2D randTarget = Vector2D(rand() % SCREEN_WIDTH, rand() % SCREEN_HEIGHT);
-//
-//	randTarget.x -= SCREEN_WIDTH / 2;
-//	randTarget.y -= SCREEN_HEIGHT / 2;
-//
-//	vehicle->SetWanderTarget(randTarget);
-//}
 
 Vector2D Steering::Wander(float deltaTime)
 {
@@ -113,7 +91,7 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 {
 	// creates a box in front of the vehicle to detect obstacles
 	float minDetectionBoxLength = 30.0f;
-	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
+	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (*vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
 
 	Vector2D vehPos = vehicle->GetPositionVector();
 	Vehicle* otherVeh = vehicle->GetOtherVehicle();
@@ -166,8 +144,6 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 
 	// seek to the mouse click when not colliding
 	return Seek(_target);
-	//// no waypoints collided with. return nothing.
-	//return Vector2D();
 }
 
 Vector2D Steering::Pursuit(Vehicle* _target)
@@ -183,7 +159,7 @@ Vector2D Steering::Pursuit(Vehicle* _target)
 	}
 
 	//if target is not in front then it will be cut off
-	float lookAheadTime = toTarget.Length() / (vehicle->GetMaxSpeed() + _target->GetCurrentSpeed());
+	float lookAheadTime = toTarget.Length() / (*vehicle->GetMaxSpeed() + _target->GetCurrentSpeed());
 
-	return Seek(_target->GetPositionVector() + _target->GetVelocity() * lookAheadTime);
+	return Seek(_target->GetPositionVector() + *_target->GetVelocity() * lookAheadTime);
 }

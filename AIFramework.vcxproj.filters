@@ -36,6 +36,7 @@
       <Filter>ImGUI</Filter>
     </ClCompile>
     <ClCompile Include="Steering.cpp" />
+    <ClCompile Include="StateMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -82,6 +83,9 @@
     </ClInclude>
     <ClInclude Include="Steering.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="StateMachine.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="SteeringState.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\blue.dds">

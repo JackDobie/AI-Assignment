@@ -5,6 +5,7 @@
 #include "Vector2D.h"
 #include "Constants.h"
 #include "Steering.h"
+#include "StateMachine.h"
 
 class Steering;
 
@@ -35,19 +36,25 @@ protected:
 
 	float _speedFactor;
 	float _speedBoostTimer;
+
+	StateMachine* _stateMachine;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
-	virtual void Update(const float deltaTime);
+	virtual void Update(float deltaTime);
 
-	float GetMaxSpeed() { return _maxSpeed; }
+	Vector2D GetCurrentPosition() { return _currentPosition; }
+
+	float* GetMaxSpeed() { return &_maxSpeed; }
 	void SetMaxSpeed(const float maxSpeed) { _maxSpeed = maxSpeed; }
 
 	float GetCurrentSpeed() { return _currentSpeed; }
 	void SetCurrentSpeed(const float speed); // a ratio: a value between 0 and 1 (1 being max speed)
 
-	Vector2D GetVelocity() { return _velocity; }
+	float GetSpeedBoostTimer() { return _speedBoostTimer; }
+
+	Vector2D* GetVelocity() { return &_velocity; }
 	void SetVelocity(Vector2D newVelocity) { _velocity = newVelocity; }
 
 	Vector2D GetTarget() { return _positionTo; }
@@ -56,8 +63,6 @@ public:
 
 	Vector2D GetWanderTarget() { return _wanderTarget; }
 	void SetWanderTarget(Vector2D newTarget) { _wanderTarget = newTarget; }
-
-	void DrawUI();
 
 	Vehicle* GetOtherVehicle() { return _otherVehicle; }
 	void SetOtherVehicle(Vehicle* otherVeh) { _otherVehicle = otherVeh; }
@@ -68,5 +73,14 @@ public:
 	void Boost();
 
 	float GetSpeedFactor() { return _speedFactor; }
+
+	void Reset();
+
+	string GetName() { return _name; }
+	void SetName(string newName) { _name = newName; }
+
+	Steering* GetSteering() { return _steering; }
+
+	StateMachine* GetStateMachine() { return _stateMachine; }
 };
 
