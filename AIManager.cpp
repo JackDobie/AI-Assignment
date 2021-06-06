@@ -15,12 +15,12 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 
     // create the vehicles ------------------------------------------------
     pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
-    hr = pCar->initMesh(pd3dDevice);
+    hr = pCar->initMesh(pd3dDevice, L"Resources\\car_blue.dds");
     if (FAILED(hr))
         return hr;
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
-    hr = AICar->initMesh(pd3dDevice);
+    hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
     pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
@@ -68,11 +68,14 @@ void AIManager::update(const float fDeltaTime)
         AddItemToDrawList(w);
     }*/
 
-    //for (unsigned int i = 0; i < m_waypoints.size(); i++)
-    //{
-    //    m_waypoints[i]->update(fDeltaTime);
-    //    //AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
-    //}
+    if (displayWaypoints)
+    {
+        for (unsigned int i = 0; i < m_waypoints.size(); i++)
+        {
+            m_waypoints[i]->update(fDeltaTime);
+            AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
+        }
+    }
 
     for (Waypoint* w : m_waypoints)
     {

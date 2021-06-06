@@ -41,5 +41,7 @@ private:
 	PickupItem*				pPickup;
 	Vehicle*				pCar = nullptr;
 	Vehicle*				AICar = nullptr;
+
+	bool					displayWaypoints = false;
 };
 

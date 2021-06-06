@@ -38,7 +38,7 @@ protected:
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 
-	virtual HRESULT initMesh(ID3D11Device* pd3dDevice);
+	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
 	virtual void Update(const float deltaTime);
 
 	float GetMaxSpeed() { return _maxSpeed; }

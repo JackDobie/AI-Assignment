@@ -10,10 +10,10 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	_speedFactor = 1.0f;
 }
 
-HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice)
+HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
 {
 	m_scale = XMFLOAT3(30, 20, 1);
-	setTextureName(L"Resources\\car_blue.dds");
+	setTextureName(texturePath);
 
 	HRESULT hr = DrawableGameObject::initMesh(pd3dDevice);
 
