@@ -1,0 +1,37 @@
+#pragma once
+
+#include <list>
+#include <vector>
+#include "Vector2D.h"
+using namespace std;
+
+struct node
+{
+    // is this node an obstacle?
+    bool isObstacle = false;
+    // has this node been visited previously?
+    bool visited = false;
+    // distance to goal
+    float globalGoal = FLT_MAX;
+    float localGoal = FLT_MAX;
+    // position in 2d space
+    Vector2D pos = Vector2D();
+    // connecting nodes
+    vector<node*> neighbours;
+    // node connected to this node that has the shortest path
+    node* parent = nullptr;
+};
+
+class Pathfinder
+{
+public:
+    Pathfinder(node* startNode, node* destination);
+
+    void FindPath();
+
+    vector<node*> GetNodes() { return _nodePath; }
+private:
+    node* _startNode = nullptr;
+    node* _destination = nullptr;
+    vector<node*> _nodePath;
+};

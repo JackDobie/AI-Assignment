@@ -1,6 +1,7 @@
 #pragma once
 
 #include "State.h"
+#include "Pathfinder.h"
 
 class Vehicle;
 

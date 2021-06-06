@@ -16,7 +16,8 @@ public:
 
 	void Exit() override
 	{
-
+		int* type = (int*)&_vehicle->GetSteering()->activeType;
+		type = 0;
 	}
 
 	void Update(float deltaTime) override

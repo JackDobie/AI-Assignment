@@ -30,8 +30,6 @@ public:
 
     BehaviourType activeType;
 private:
-    bool IsActive(BehaviourType type) { return (type == activeType); }
-
     Vector2D Seek(Vector2D _target);
     float seekWeight = 10.0f;
 

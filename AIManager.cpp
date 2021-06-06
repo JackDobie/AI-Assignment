@@ -34,6 +34,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float yGap = SCREEN_HEIGHT / WAYPOINT_RESOLUTION;
     float xStart = -(SCREEN_WIDTH / 2) + (xGap / 2);
     float yStart = -(SCREEN_HEIGHT / 2) + (yGap / 2);
+
     unsigned int index = 0;
     for (unsigned int j = 0; j < WAYPOINT_RESOLUTION; j++)
     {
@@ -46,8 +47,10 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 
             if (wp->isOnTrack())
             {
-                if(wp->isCheckpoint())
+                if (wp->isCheckpoint())
+                {
                     pPickup->placeablePositions.push_back(wp->GetPositionVector());
+                }
             }
         }
     }

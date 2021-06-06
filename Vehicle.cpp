@@ -134,7 +134,7 @@ void Vehicle::DrawUI()
 
 void Vehicle::Boost()
 {
-	_speedFactor = 1.2f;
+	_speedFactor = 1.3f;
 	_speedBoostTimer = 3.0f;
 }
 
