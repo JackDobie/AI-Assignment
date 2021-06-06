@@ -112,6 +112,26 @@ void Vehicle::SetVehiclePosition(Vector2D position)
 	setPosition(XMFLOAT3((float)position.x, (float)position.y, 0));
 }
 
+void Vehicle::DrawUI()
+{
+	ImGui::Begin((_name + " details").c_str());
+	ImGui::Text("Position:\nX: %.3f, Y: %.3f", _currentPosition.x, _currentPosition.y);
+	if (_steering->activeType == Steering::BehaviourType::wander)
+	{
+		ImGui::Text("Wander target:\nX: %.3f, Y: %.3f", _wanderTarget.x, _wanderTarget.y);
+	}
+
+	ImGui::Text("Current Speed: %.3f", _currentSpeed);
+	ImGui::SliderFloat("Max Speed", &_maxSpeed, 0.0f, 400.0f);
+	if (_speedBoostTimer > 0.0f)
+	{
+		ImGui::Text("Speed boost! Time remaining: %.3f", _speedBoostTimer);
+	}
+	ImGui::End();
+
+	_stateMachine->DrawUI();
+}
+
 void Vehicle::Boost()
 {
 	_speedFactor = 1.2f;

@@ -33,7 +33,7 @@ public:
 	Waypoint*				GetWaypoint(int x, int y);
 	vector<Waypoint*>		GetNeighbours(int x, int y);
 
-	void DrawUI();
+	void					DrawUI();
 private:
 	bool					checkForCollisions();
 
@@ -46,6 +46,5 @@ private:
 
 	SteeringState*			_steeringState;
 	PathfindingState*		_pathfindingState;
-	PathfindingState*		_AIPathfindingState;
 };
 

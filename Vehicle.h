@@ -65,6 +65,8 @@ public:
 	Vector2D GetWanderTarget() { return _wanderTarget; }
 	void SetWanderTarget(Vector2D newTarget) { _wanderTarget = newTarget; }
 
+	void DrawUI();
+
 	Vehicle* GetOtherVehicle() { return _otherVehicle; }
 	void SetOtherVehicle(Vehicle* otherVeh) { _otherVehicle = otherVeh; }
 

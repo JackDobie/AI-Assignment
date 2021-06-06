@@ -27,9 +27,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
-    
-    _AIPathfindingState = new PathfindingState(AICar);
-    AICar->InitStateMachine(_AIPathfindingState);
+    AICar->InitStateMachine(new PathfindingState(AICar));
 
     // create the waypoints
     float xGap = SCREEN_WIDTH / WAYPOINT_RESOLUTION;
@@ -254,5 +252,5 @@ void AIManager::DrawUI()
 
     ImGui::End();
 
-    pCar->GetStateMachine()->DrawUI();
+    pCar->DrawUI();
 }
