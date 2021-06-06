@@ -29,8 +29,6 @@ public:
     };
 
     BehaviourType activeType;
-
-    vector<Waypoint*> offTrackPoints;
 private:
     bool IsActive(BehaviourType type) { return (type == activeType); }
 

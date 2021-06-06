@@ -68,7 +68,5 @@ public:
 	void Boost();
 
 	float GetSpeedFactor() { return _speedFactor; }
-
-	void SetOffTrackPoints(vector<Waypoint*> v) { _steering->offTrackPoints = v; }
 };
 

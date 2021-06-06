@@ -119,7 +119,6 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 	Vehicle* otherVeh = vehicle->GetOtherVehicle();
 
 	Vehicle* closestObstacle = nullptr;
-	float closestObstacleDist = D3D11_FLOAT32_MAX;
 	Vector2D closestObstacleLocalPos = Vector2D();
 
 	float aRadius = 30.0f * 1.2f;
@@ -140,22 +139,8 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 		{
 			if (localPos.LengthSq() < expandedRadius * expandedRadius)
 			{
-				float sqrPart = sqrt(expandedRadius * expandedRadius - localPos.y * localPos.y);
-
-				float ip = localPos.x - sqrPart;
-
-				if (ip <= 0.0)
-				{
-					ip += localPos.x + sqrPart;
-				}
-
-				// find the closest obstacle to steer away from
-				if (ip < closestObstacleDist)
-				{
-					closestObstacleDist = ip;
-					closestObstacle = otherVeh;
-					closestObstacleLocalPos = localPos;
-				}
+				closestObstacle = otherVeh;
+				closestObstacleLocalPos = localPos;
 			}
 		}
 	}
