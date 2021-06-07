@@ -50,4 +50,9 @@ public:
 
 		ImGui::End();
 	}
+
+	int GetCurrentState() override
+	{
+		return 0;
+	}
 };

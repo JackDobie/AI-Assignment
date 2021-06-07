@@ -148,7 +148,7 @@ void Vehicle::Reset()
 
 Waypoint* Vehicle::GetWaypoint(int x, int y)
 {
-	y = WAYPOINT_RESOLUTION - y;
+	y = (WAYPOINT_RESOLUTION - 1) - y;
 	int index = y * WAYPOINT_RESOLUTION + x;
 	Waypoint* w = nullptr;
 	if (_waypoints.size() > index)

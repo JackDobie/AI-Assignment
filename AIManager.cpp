@@ -55,13 +55,13 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
 
-    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
+    /*AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
-    pCar->SetOtherVehicle(AICar);
     if (FAILED(hr))
         return hr;
     AICar->SetWaypoints(m_waypoints);
-    AICar->InitStateMachine(new PathfindingState(AICar));
+    AICar->InitStateMachine(new PathfindingState(nullptr));
+    pCar->SetOtherVehicle(AICar);*/
 
     return hr;
 }
@@ -77,10 +77,10 @@ void AIManager::update(const float fDeltaTime)
 
     if (displayWaypoints)
     {
-        for (unsigned int i = 0; i < m_waypoints.size(); i++)
+        for (Waypoint* w : m_waypoints)
         {
-            m_waypoints[i]->update(fDeltaTime);
-            AddItemToDrawList(m_waypoints[i]); // if you comment this in, it will display the waypoints
+            w->update(fDeltaTime);
+            AddItemToDrawList(w);
         }
     }
 
@@ -105,17 +105,19 @@ void AIManager::update(const float fDeltaTime)
     AddItemToDrawList(pPickup);
 
     pCar->Update(fDeltaTime);
-    AICar->Update(fDeltaTime);
+    //AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
     AddItemToDrawList(pCar);
-    AddItemToDrawList(AICar);
+    //AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)
 {
-    pCar->SetPositionTo(Vector2D(x, y));
+    // only click to move if steering
+    if(pCar->GetStateMachine()->GetCurrentState()->GetCurrentState() == 0)
+        pCar->SetPositionTo(Vector2D(x, y));
 }
 
 void AIManager::keyPress(WPARAM param)
@@ -258,6 +260,11 @@ void AIManager::DrawUI()
     if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
     {
         pCar->GetStateMachine()->ChangeState(_pathfindingState);
+    }
+
+    if (ImGui::Button("Toggle waypoints"))
+    {
+        displayWaypoints = !displayWaypoints;
     }
 
     ImGui::End();

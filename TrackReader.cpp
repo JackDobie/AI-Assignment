@@ -85,6 +85,9 @@ bool TrackReader::ReadFile(string filePath)
 			case 'O':
 				waypoints[14] = n;
 				break;
+			default:
+				Debug::Print("Unknown character read from file: " + c);
+				break;
 			}
 		}
 	}

@@ -12,6 +12,7 @@ public:
 	virtual void Exit() = 0;
 	virtual void Update(float deltaTime) = 0;
 	virtual void DrawUI() = 0;
+	virtual int GetCurrentState() = 0;
 protected:
 	Vehicle* _vehicle;
 };

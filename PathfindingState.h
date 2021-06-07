@@ -18,8 +18,13 @@ public:
 
 	void Update(float deltaTime) override;
 
-private:
 	void DrawUI() override;
+
+	int GetCurrentState() override
+	{
+		return 1;
+	}
+private:
 	Waypoint* GetWaypoint(node* n);
 
 	vector<node*> _waypoints;

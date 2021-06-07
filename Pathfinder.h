@@ -30,6 +30,8 @@ public:
 
     void FindPath(node* startNode, node* destination);
 
+    void Reset();
+
     vector<node*> GetNodePath() { return _nodePath; }
 private:
     vector<node*> _nodePath;

@@ -4,6 +4,7 @@
 #include <string>
 #include "Pathfinder.h"
 #include "Vehicle.h"
+#include "Debug.h"
 using namespace std;
 
 class TrackReader
