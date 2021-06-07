@@ -10,9 +10,9 @@ void PathfindingState::Start()
 	_trackReader->ReadFile("Resources/waypoints.txt");
 	_waypoints = _trackReader->GetWaypoints();
 	// get start and end points between first two waypoints
-	_waypointIndex = _waypoints.size() - 1;
+	_waypointIndex = 0;
 	_startNode = _waypoints[_waypointIndex];
-	_endNode = _waypoints[0];
+	_endNode = _waypoints[++_waypointIndex];
 	// move vehicle to the first waypoint
 	_vehicle->SetVehiclePosition(GetWaypoint(_startNode)->GetPositionVector());
 	// calculate a path to the next waypoint
@@ -39,15 +39,23 @@ void PathfindingState::Exit()
 
 void PathfindingState::Update(float deltaTime)
 {
+	for (node* n : _nodePath)
+	{
+		GetWaypoint(n)->draw = true;
+	}
+
+	static int pathCount = 1;
 	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 7.5f)
 	{
 		if (_pathIndex < _nodePath.size() - 1)
 		{
+			pathCount++;
 			_pathIndex++;
 			_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 			_vehicle->SetPositionTo(_targetPos);
 		}
 	}
+	ImGui::Text(to_string(pathCount).c_str());
 
 	// check if got to the end of the path
 	//if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 50.0f)

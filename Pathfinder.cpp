@@ -80,6 +80,9 @@ void Pathfinder::Reset()
 	for (node* n : _nodePath)
 	{
 		n->parent = nullptr;
+		n->globalGoal = FLT_MAX;
+		n->localGoal = FLT_MAX;
+		n->visited = false;
 	}
 	_nodePath.clear();
 }
