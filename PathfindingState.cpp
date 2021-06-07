@@ -58,8 +58,8 @@ void PathfindingState::Update(float deltaTime)
 	ImGui::Text(to_string(pathCount).c_str());
 
 	// check if got to the end of the path
-	//if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 50.0f)
-	if(_pathIndex == _nodePath.size() - 1)
+	//if (_pathIndex == _nodePath.size() - 1)
+	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 7.5f)
 	{
 		_pathIndex = 0;
 
