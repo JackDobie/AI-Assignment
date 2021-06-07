@@ -11,12 +11,12 @@ void PathfindingState::Start()
 	_startNode = _waypoints[_waypointIndex];
 	_endNode = _waypoints[++_waypointIndex];
 	// move vehicle to the first node
-	_vehicle->SetVehiclePosition(_vehicle->GetWaypoint(_startNode->pos.x, _startNode->pos.y)->GetPositionVector());
+	_vehicle->SetVehiclePosition(GetWaypoint(_startNode)->GetPositionVector());
 	_pathfinder = new Pathfinder();
 	_pathfinder->FindPath(_startNode, _endNode);
 	_nodePath = _pathfinder->GetNodePath();
 	_pathIndex = 0;
-	_targetPos = _vehicle->GetWaypoint(_nodePath[_pathIndex]->pos.x, _nodePath[_pathIndex]->pos.y)->GetPositionVector();
+	_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 	// set the vehicle to seek to the first node in the path
 	_vehicle->GetSteering()->activeType = Steering::BehaviourType::seek;
 	_vehicle->SetPositionTo(_targetPos);
@@ -56,23 +56,26 @@ void PathfindingState::Update(float deltaTime)
 	}
 
 	// compare vehicle position to end node
-	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 200.0f)
+	//if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 100.0f)
+	if(_pathIndex + 1 == _nodePath.size())
 	{
-		_pathIndex = 0;
 		// go to the next waypoint, or loop around when at the end
 		if (_waypointIndex < _waypoints.size() - 1)
 		{
+			_pathIndex = 0;
 			_startNode = _waypoints[_waypointIndex];
 			_endNode = _waypoints[++_waypointIndex];
 		}
 		else
 		{
+			_pathIndex = 0;
 			_startNode = _waypoints[_waypointIndex];
 			_waypointIndex = 0;
 			_endNode = _waypoints[_waypointIndex];
 		}
 
 		_pathfinder->FindPath(_startNode, _endNode);
+		_nodePath.clear();
 		_nodePath = _pathfinder->GetNodePath();
 		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
