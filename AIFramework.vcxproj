@@ -379,6 +379,7 @@
     <ClCompile Include="PickupItem.cpp" />
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="Steering.cpp" />
+    <ClCompile Include="TrackReader.cpp" />
     <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="Waypoint.cpp" />
   </ItemGroup>
@@ -409,6 +410,7 @@
     <ClInclude Include="Steering.h" />
     <ClInclude Include="SteeringState.h" />
     <ClInclude Include="structures.h" />
+    <ClInclude Include="TrackReader.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="Waypoint.h" />

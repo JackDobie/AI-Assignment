@@ -38,6 +38,8 @@ protected:
 	float _speedBoostTimer;
 
 	StateMachine* _stateMachine;
+
+	vector<Waypoint*> _waypoints;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
@@ -85,5 +87,11 @@ public:
 	Steering* GetSteering() { return _steering; }
 
 	StateMachine* GetStateMachine() { return _stateMachine; }
+
+	Waypoint* GetWaypoint(int x, int y);
+	vector<Waypoint*> GetNeighbours(int x, int y);
+
+	vector<Waypoint*> GetWaypoints() { return _waypoints; }
+	void SetWaypoints(vector<Waypoint*> newWaypoints) { _waypoints = newWaypoints; }
 };
 

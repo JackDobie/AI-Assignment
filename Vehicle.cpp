@@ -145,3 +145,60 @@ void Vehicle::Reset()
 	_steering->activeType = Steering::BehaviourType::none;
 	_speedFactor = 1.0f;
 }
+
+Waypoint* Vehicle::GetWaypoint(int x, int y)
+{
+	int index = y * WAYPOINT_RESOLUTION + x;
+	Waypoint* w = nullptr;
+	if (_waypoints.size() > index)
+	{
+		w = _waypoints[index];
+	}
+	return w;
+}
+
+vector<Waypoint*> Vehicle::GetNeighbours(int x, int y)
+{
+	vector<Waypoint*> neighbours;
+	if (y > 0)
+	{
+		neighbours.push_back(GetWaypoint(x, y - 1)); //top
+
+		if (x > 0)
+		{
+			neighbours.push_back(GetWaypoint(x - 1, y - 1)); //top left
+		}
+
+		if (x < WAYPOINT_RESOLUTION)
+		{
+			neighbours.push_back(GetWaypoint(x + 1, y - 1)); //top right
+		}
+	}
+
+	if (x > 0)
+	{
+		neighbours.push_back(GetWaypoint(x - 1, y)); //left
+	}
+
+	if (x < WAYPOINT_RESOLUTION)
+	{
+		neighbours.push_back(GetWaypoint(x + 1, y)); //right
+	}
+
+	if (y < WAYPOINT_RESOLUTION)
+	{
+		neighbours.push_back(GetWaypoint(x, y + 1)); //right
+
+		if (x > 0)
+		{
+			neighbours.push_back(GetWaypoint(x - 1, y + 1)); //top right
+		}
+
+		if (x < WAYPOINT_RESOLUTION)
+		{
+			neighbours.push_back(GetWaypoint(x + 1, y + 1)); //bottom right
+		}
+	}
+
+	return neighbours;
+}

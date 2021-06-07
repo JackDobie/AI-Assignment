@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include "Vector2D.h"
+#include "Constants.h"
 using namespace std;
 
 struct node
@@ -25,11 +26,11 @@ struct node
 class Pathfinder
 {
 public:
-    Pathfinder(node* startNode, node* destination);
+    Pathfinder();
 
-    void FindPath();
+    void FindPath(node* startNode, node* destination);
 
-    vector<node*> GetNodes() { return _nodePath; }
+    vector<node*> GetNodePath() { return _nodePath; }
 private:
     node* _startNode = nullptr;
     node* _destination = nullptr;

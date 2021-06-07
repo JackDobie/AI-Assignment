@@ -1,12 +1,11 @@
 #include "Pathfinder.h"
 
-Pathfinder::Pathfinder(node* startNode, node* destination)
+Pathfinder::Pathfinder()
 {
-	_startNode = startNode;
-	_destination = destination;
+
 }
 
-void Pathfinder::FindPath()
+void Pathfinder::FindPath(node* startNode, node* destination)
 {
 	_nodePath.clear();
 

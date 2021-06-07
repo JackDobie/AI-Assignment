@@ -6,28 +6,7 @@
 
 HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
 {
-    // create a pickup item ----------------------------------------------
-
-    pPickup = new PickupItem();
-    HRESULT hr = pPickup->initMesh(pd3dDevice);
-    if (FAILED(hr))
-        return hr;
-
-    // create the vehicles ------------------------------------------------
-    pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
-    hr = pCar->initMesh(pd3dDevice, L"Resources\\car_blue.dds");
-    if (FAILED(hr))
-        return hr;
-    _steeringState = new SteeringState(pCar);
-    _pathfindingState = new PathfindingState(pCar);
-    pCar->InitStateMachine(_steeringState);
-
-    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
-    hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
-    pCar->SetOtherVehicle(AICar);
-    if (FAILED(hr))
-        return hr;
-    AICar->InitStateMachine(new PathfindingState(AICar));
+    HRESULT hr;
 
     // create the waypoints
     float xGap = SCREEN_WIDTH / WAYPOINT_RESOLUTION;
@@ -42,6 +21,8 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
         {
             Waypoint* wp = new Waypoint();
             hr = wp->initMesh(pd3dDevice, index++);
+            if (FAILED(hr))
+                return hr;
             wp->setPosition(XMFLOAT3(xStart + (xGap * i), yStart + (yGap * j), 0));
             m_waypoints.push_back(wp);
 
@@ -54,7 +35,31 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
             }
         }
     }
+
+    // create a pickup item ----------------------------------------------
+    pPickup = new PickupItem();
+    hr = pPickup->initMesh(pd3dDevice);
+    if (FAILED(hr))
+        return hr;
     pPickup->GetNewPosition();
+
+    // create the vehicles ------------------------------------------------
+    pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
+    hr = pCar->initMesh(pd3dDevice, L"Resources\\car_blue.dds");
+    if (FAILED(hr))
+        return hr;
+    _steeringState = new SteeringState(pCar);
+    _pathfindingState = new PathfindingState(pCar);
+    pCar->SetWaypoints(m_waypoints);
+    pCar->InitStateMachine(_steeringState);
+
+    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
+    hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
+    pCar->SetOtherVehicle(AICar);
+    if (FAILED(hr))
+        return hr;
+    AICar->SetWaypoints(m_waypoints);
+    AICar->InitStateMachine(new PathfindingState(AICar));
 
     return hr;
 }
