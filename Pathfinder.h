@@ -26,13 +26,11 @@ struct node
 class Pathfinder
 {
 public:
-    Pathfinder();
+    Pathfinder(node* startNode, node* destination);
 
     void FindPath(node* startNode, node* destination);
 
     vector<node*> GetNodePath() { return _nodePath; }
 private:
-    node* _startNode = nullptr;
-    node* _destination = nullptr;
     vector<node*> _nodePath;
 };

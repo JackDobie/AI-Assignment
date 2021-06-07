@@ -100,12 +100,55 @@ bool TrackReader::ReadFile(string filePath)
 		for (int x = 0; x < mapWidth; x++)
 		{
 			node* n = &nodes[y * mapWidth + x];
-			vector<Waypoint*> waypointNeighbours = vehicle->GetNeighbours(n->pos.x, n->pos.y);
-			vector<node*> nodeNeighbours;
-			for (Waypoint* w : waypointNeighbours)
-			{
-				node* n = new node();
-			}
+			vector<node*> nodeNeighbours = GetNeighbours(x, y);
+			n->neighbours = nodeNeighbours;
 		}
 	}
+	return true;
+}
+
+vector<node*> TrackReader::GetNeighbours(int x, int y)
+{
+	vector<node*> neighbours;
+	if (y > 0)
+	{
+		neighbours.push_back(&nodes[(y - 1) * mapWidth + (x)]); //top
+
+		if (x > 0)
+		{
+			neighbours.push_back(&nodes[(y - 1) * mapWidth + (x - 1)]); //top left
+		}
+
+		if (x < WAYPOINT_RESOLUTION)
+		{
+			neighbours.push_back(&nodes[(y - 1) * mapWidth + (x + 1)]); //top right
+		}
+	}
+
+	if (x > 0)
+	{
+		neighbours.push_back(&nodes[(y) * mapWidth + (x - 1)]); //left
+	}
+
+	if (x < WAYPOINT_RESOLUTION)
+	{
+		neighbours.push_back(&nodes[(y) * mapWidth + (x + 1)]); //right
+	}
+
+	if (y < WAYPOINT_RESOLUTION)
+	{
+		neighbours.push_back(&nodes[(y + 1) * mapWidth + (x)]); //right
+
+		if (x > 0)
+		{
+			neighbours.push_back(&nodes[(y + 1) * mapWidth + (x - 1)]); //top right
+		}
+
+		if (x < WAYPOINT_RESOLUTION)
+		{
+			neighbours.push_back(&nodes[(y + 1) * mapWidth + (x + 1)]); //bottom right
+		}
+	}
+
+	return neighbours;
 }

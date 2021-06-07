@@ -9,14 +9,21 @@ using namespace std;
 class TrackReader
 {
 public:
-	TrackReader(Vehicle* v) : vehicle(v) {}
+	TrackReader()
+	{
+		waypoints.resize(15, nullptr);
+	}
 
 	bool ReadFile(string filePath);
+
+	node* GetNodes() { return nodes; }
+	vector<node*> GetWaypoints() { return waypoints; }
 private:
+	vector<node*> GetNeighbours(int x, int y);
+
 	int mapWidth = 0;
 	int mapHeight = 0;
 	node* nodes = nullptr;
-	node* waypoints[15] = {};
-
-	Vehicle* vehicle;
+	vector<node*> waypoints;
+	//node* waypoints[15] = {};
 };

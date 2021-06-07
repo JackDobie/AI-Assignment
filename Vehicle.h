@@ -89,8 +89,6 @@ public:
 	StateMachine* GetStateMachine() { return _stateMachine; }
 
 	Waypoint* GetWaypoint(int x, int y);
-	vector<Waypoint*> GetNeighbours(int x, int y);
-
 	vector<Waypoint*> GetWaypoints() { return _waypoints; }
 	void SetWaypoints(vector<Waypoint*> newWaypoints) { _waypoints = newWaypoints; }
 };

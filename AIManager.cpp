@@ -14,6 +14,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     float xStart = -(SCREEN_WIDTH / 2) + (xGap / 2);
     float yStart = -(SCREEN_HEIGHT / 2) + (yGap / 2);
 
+    vector<Vector2D> placeablePositions;
     unsigned int index = 0;
     for (unsigned int j = 0; j < WAYPOINT_RESOLUTION; j++)
     {
@@ -30,7 +31,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
             {
                 if (wp->isCheckpoint())
                 {
-                    pPickup->placeablePositions.push_back(wp->GetPositionVector());
+                    placeablePositions.push_back(wp->GetPositionVector());
                 }
             }
         }
@@ -41,6 +42,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     hr = pPickup->initMesh(pd3dDevice);
     if (FAILED(hr))
         return hr;
+    pPickup->placeablePositions = placeablePositions;
     pPickup->GetNewPosition();
 
     // create the vehicles ------------------------------------------------

@@ -3,6 +3,7 @@
 #include "State.h"
 #include "Pathfinder.h"
 #include "TrackReader.h"
+#include "Debug.h"
 
 class Vehicle;
 
@@ -19,10 +20,10 @@ public:
 
 	void DrawUI() override;
 private:
-	vector<node*> waypoints;
+	vector<node*> _waypoints;
 	int _waypointIndex;
 	node* _currentNode;
-	vector<node*> _currentNodePath;
+	vector<node*> _nodePath;
 	Vector2D _targetPos;
 	Pathfinder* _pathfinder;
 	TrackReader* _trackReader;

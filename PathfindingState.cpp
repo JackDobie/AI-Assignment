@@ -5,8 +5,17 @@ void PathfindingState::Start()
 {
 	_vehicle->Reset();
 	_waypointIndex = 0;
-	_pathfinder = new Pathfinder();
-	_trackReader = new TrackReader(_vehicle);
+	_trackReader = new TrackReader();
+	if (!_trackReader->ReadFile("Resources/waypoints.txt"))
+	{
+		Debug::Print("ERROR: Could not read file!");
+	}
+	else
+	{
+		_waypoints = _trackReader->GetWaypoints();
+		_pathfinder = new Pathfinder(_waypoints[0], _waypoints[1]);
+		_nodePath = _pathfinder->GetNodePath();
+	}
 }
 
 void PathfindingState::Exit()

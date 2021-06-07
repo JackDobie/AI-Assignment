@@ -1,8 +1,8 @@
 #include "Pathfinder.h"
 
-Pathfinder::Pathfinder()
+Pathfinder::Pathfinder(node* startNode, node* destination)
 {
-
+	FindPath(startNode, destination);
 }
 
 void Pathfinder::FindPath(node* startNode, node* destination)
@@ -17,10 +17,10 @@ void Pathfinder::FindPath(node* startNode, node* destination)
 
 	node* currentNode = new node();
 	currentNode->localGoal = 0.0f;
-	currentNode->globalGoal = distance(_startNode, _destination);
-	currentNode->isObstacle = _startNode->isObstacle;
-	currentNode->visited = _startNode->visited;
-	currentNode->neighbours = _startNode->neighbours;
+	currentNode->globalGoal = distance(startNode, destination);
+	currentNode->isObstacle = startNode->isObstacle;
+	currentNode->visited = startNode->visited;
+	currentNode->neighbours = startNode->neighbours;
 
 	list<node*> untestedNodes;
 	untestedNodes.push_back(currentNode);
@@ -58,7 +58,7 @@ void Pathfinder::FindPath(node* startNode, node* destination)
 			{
 				neighbour->parent = currentNode;
 				neighbour->localGoal = possibleLowerGoal;
-				neighbour->globalGoal = neighbour->localGoal + distance(neighbour, _destination);
+				neighbour->globalGoal = neighbour->localGoal + distance(neighbour, destination);
 			}
 		}
 	}
@@ -66,15 +66,15 @@ void Pathfinder::FindPath(node* startNode, node* destination)
 	// get the parent of the final node and go back to the start node to find the correct path
 	// put them all into a vector so that they can be compared to get the direction
 
-	if (_destination->parent != nullptr)
+	if (destination->parent != nullptr)
 	{
-		node* n = _destination;
+		node* n = destination;
 		while (n->parent != nullptr)
 		{
 			_nodePath.push_back(n);
 			n = n->parent;
 		}
-		_nodePath.push_back(_startNode); // start node is not included in the loop as it does not have a parent
+		_nodePath.push_back(startNode); // start node is not included in the loop as it does not have a parent
 
 		// reverse the vector to get the nodes in order from start to end
 		reverse(_nodePath.begin(), _nodePath.end());
