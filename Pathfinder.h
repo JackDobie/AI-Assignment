@@ -26,7 +26,7 @@ struct node
 class Pathfinder
 {
 public:
-    Pathfinder(node* startNode, node* destination);
+    Pathfinder() {};
 
     void FindPath(node* startNode, node* destination);
 

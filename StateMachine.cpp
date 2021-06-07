@@ -3,6 +3,11 @@
 StateMachine::StateMachine(State* startState)
 {
 	currentState = startState;
+
+	if (currentState != nullptr)
+	{
+		currentState->Start();
+	}
 }
 
 void StateMachine::Update(float deltaTime)

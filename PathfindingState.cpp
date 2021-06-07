@@ -4,18 +4,24 @@
 void PathfindingState::Start()
 {
 	_vehicle->Reset();
-	_waypointIndex = 0;
 	_trackReader = new TrackReader();
-	if (!_trackReader->ReadFile("Resources/waypoints.txt"))
-	{
-		Debug::Print("ERROR: Could not read file!");
-	}
-	else
-	{
-		_waypoints = _trackReader->GetWaypoints();
-		_pathfinder = new Pathfinder(_waypoints[0], _waypoints[1]);
-		_nodePath = _pathfinder->GetNodePath();
-	}
+	_trackReader->ReadFile("Resources/waypoints.txt");
+	_waypoints = _trackReader->GetWaypoints();
+	_waypointIndex = 0;
+	_startNode = _waypoints[_waypointIndex];
+	_endNode = _waypoints[++_waypointIndex];
+	// move vehicle to the first node
+	_vehicle->SetVehiclePosition(_vehicle->GetWaypoint(_startNode->pos.x, _startNode->pos.y)->GetPositionVector());
+	_pathfinder = new Pathfinder();
+	_pathfinder->FindPath(_startNode, _endNode);
+	_nodePath = _pathfinder->GetNodePath();
+	_pathIndex = 0;
+	_targetPos = _vehicle->GetWaypoint(_nodePath[_pathIndex]->pos.x, _nodePath[_pathIndex]->pos.y)->GetPositionVector();
+	// set the vehicle to seek to the first node in the path
+	_vehicle->GetSteering()->activeType = Steering::BehaviourType::seek;
+	_vehicle->SetPositionTo(_targetPos);
+	GetWaypoint(_nodePath[_pathIndex])->draw = true;
+
 }
 
 void PathfindingState::Exit()
@@ -30,11 +36,64 @@ void PathfindingState::Exit()
 
 void PathfindingState::Update(float deltaTime)
 {
-	//Vector2D wpPos = _vehicle->GetWaypoint(/*currentnode pos*/)->GetPositionVector()
-	//if(Vec2DDistance(_vehicle->GetPositionVector(), ))
+	for (node* n : _nodePath)
+	{
+		if (n != _nodePath[_pathIndex])
+		{
+			GetWaypoint(n)->draw = false;
+		}
+	}
+
+	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 10.0f)
+	{
+		if (_pathIndex < _nodePath.size() - 1)
+		{
+			_pathIndex++;
+			_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
+			_vehicle->SetPositionTo(_targetPos);
+			GetWaypoint(_nodePath[_pathIndex])->draw = true;
+		}
+	}
+
+	// compare vehicle position to end node
+	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 200.0f)
+	{
+		_pathIndex = 0;
+		// go to the next waypoint, or loop around when at the end
+		if (_waypointIndex < _waypoints.size() - 1)
+		{
+			_startNode = _waypoints[_waypointIndex];
+			_endNode = _waypoints[++_waypointIndex];
+		}
+		else
+		{
+			_startNode = _waypoints[_waypointIndex];
+			_waypointIndex = 0;
+			_endNode = _waypoints[_waypointIndex];
+		}
+
+		_pathfinder->FindPath(_startNode, _endNode);
+		_nodePath = _pathfinder->GetNodePath();
+		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
+		_vehicle->SetPositionTo(_targetPos);
+	}
 }
 
 void PathfindingState::DrawUI()
 {
+	ImGui::Begin((_vehicle->GetName() + " pathfinding controls").c_str());
+	if (ImGui::Button("Reset pathfinding"))
+	{
+		_waypointIndex = 0;
+		_startNode = _waypoints[_waypointIndex];
+		_endNode = _waypoints[++_waypointIndex];
+		_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+		_vehicle->SetPositionTo(_targetPos);
+	}
+	ImGui::End();
+}
 
+Waypoint* PathfindingState::GetWaypoint(node* n)
+{
+	return _vehicle->GetWaypoint(n->pos.x, n->pos.y);
 }

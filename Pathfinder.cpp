@@ -1,10 +1,5 @@
 #include "Pathfinder.h"
 
-Pathfinder::Pathfinder(node* startNode, node* destination)
-{
-	FindPath(startNode, destination);
-}
-
 void Pathfinder::FindPath(node* startNode, node* destination)
 {
 	_nodePath.clear();
@@ -74,7 +69,6 @@ void Pathfinder::FindPath(node* startNode, node* destination)
 			_nodePath.push_back(n);
 			n = n->parent;
 		}
-		_nodePath.push_back(startNode); // start node is not included in the loop as it does not have a parent
 
 		// reverse the vector to get the nodes in order from start to end
 		reverse(_nodePath.begin(), _nodePath.end());

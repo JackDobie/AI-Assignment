@@ -18,13 +18,18 @@ public:
 
 	void Update(float deltaTime) override;
 
-	void DrawUI() override;
 private:
+	void DrawUI() override;
+	Waypoint* GetWaypoint(node* n);
+
 	vector<node*> _waypoints;
 	int _waypointIndex;
-	node* _currentNode;
+	int _pathIndex;
+	node* _startNode;
+	node* _endNode;
 	vector<node*> _nodePath;
 	Vector2D _targetPos;
+
 	Pathfinder* _pathfinder;
 	TrackReader* _trackReader;
 };
