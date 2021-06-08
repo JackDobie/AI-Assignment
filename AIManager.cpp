@@ -55,13 +55,13 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
 
-    /*AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
+    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
     if (FAILED(hr))
         return hr;
     AICar->SetWaypoints(m_waypoints);
-    AICar->InitStateMachine(new PathfindingState(nullptr));
-    pCar->SetOtherVehicle(AICar);*/
+    AICar->InitStateMachine(new SteeringState(AICar));
+    pCar->SetOtherVehicle(AICar);
 
     return hr;
 }
@@ -105,12 +105,12 @@ void AIManager::update(const float fDeltaTime)
     AddItemToDrawList(pPickup);
 
     pCar->Update(fDeltaTime);
-    //AICar->Update(fDeltaTime);
+    AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
     AddItemToDrawList(pCar);
-    //AddItemToDrawList(AICar);
+    AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)

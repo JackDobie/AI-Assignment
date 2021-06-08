@@ -21,7 +21,7 @@ bool TrackReader::ReadFile(string filePath)
 
 	nodes = new node[mapWidth * mapHeight];
 
-	for (int y = 0; y < rows; y++)
+	for (int y = 0; y < mapHeight; y++)
 	{
 		for (int x = 0; x < mapWidth; x++)
 		{
@@ -31,7 +31,6 @@ bool TrackReader::ReadFile(string filePath)
 
 			char c = map[y].c_str()[x];
 
-			// avoid setting all cases as not obstacles, only need to set x as obstacle
 			n->isObstacle = false;
 			switch (c)
 			{
@@ -86,19 +85,12 @@ bool TrackReader::ReadFile(string filePath)
 				waypoints[14] = n;
 				break;
 			default:
-				Debug::Print("Unknown character read from file: " + c);
+				Debug::Print("ERROR: Unknown character read from file: " + c);
 				break;
 			}
 		}
 	}
-	// cancel if any of the waypoints are nullptr
-	for (auto n : waypoints)
-	{
-		if (n == nullptr)
-			return false;
-	}
-
-	for (int y = 0; y < rows; y++)
+	for (int y = 0; y < mapHeight; y++)
 	{
 		for (int x = 0; x < mapWidth; x++)
 		{
@@ -107,6 +99,16 @@ bool TrackReader::ReadFile(string filePath)
 			n->neighbours = nodeNeighbours;
 		}
 	}
+
+	for (auto n : waypoints)
+	{
+		if (n == nullptr)
+		{
+			Debug::Print("ERROR: One of the waypoints was not set!");
+			return false;
+		}
+	}
+	
 	return true;
 }
 
@@ -122,7 +124,7 @@ vector<node*> TrackReader::GetNeighbours(int x, int y)
 			neighbours.push_back(&nodes[(y - 1) * mapWidth + (x - 1)]); //top left
 		}
 
-		if (x < WAYPOINT_RESOLUTION)
+		if (x < mapWidth - 1)
 		{
 			neighbours.push_back(&nodes[(y - 1) * mapWidth + (x + 1)]); //top right
 		}
@@ -133,25 +135,39 @@ vector<node*> TrackReader::GetNeighbours(int x, int y)
 		neighbours.push_back(&nodes[(y) * mapWidth + (x - 1)]); //left
 	}
 
-	if (x < WAYPOINT_RESOLUTION)
+	if (x < mapWidth - 1)
 	{
 		neighbours.push_back(&nodes[(y) * mapWidth + (x + 1)]); //right
 	}
 
-	if (y < WAYPOINT_RESOLUTION)
+	if (y < mapWidth - 1)
 	{
-		neighbours.push_back(&nodes[(y + 1) * mapWidth + (x)]); //right
+		neighbours.push_back(&nodes[(y + 1) * mapWidth + (x)]); //bottom
 
 		if (x > 0)
 		{
-			neighbours.push_back(&nodes[(y + 1) * mapWidth + (x - 1)]); //top right
+			neighbours.push_back(&nodes[(y + 1) * mapWidth + (x - 1)]); //bottom left
 		}
 
-		if (x < WAYPOINT_RESOLUTION)
+		if (x < mapWidth - 1)
 		{
 			neighbours.push_back(&nodes[(y + 1) * mapWidth + (x + 1)]); //bottom right
 		}
 	}
 
 	return neighbours;
+}
+
+vector<node*> TrackReader::GetNodeVector()
+{
+	vector<node*> nodevec;
+	for (int y = 0; y < mapHeight; y++)
+	{
+		for (int x = 0; x < mapWidth; x++)
+		{
+			node* n = &nodes[y * mapWidth + x];
+			nodevec.push_back(n);
+		}
+	}
+	return nodevec;
 }

@@ -19,6 +19,11 @@ void PathfindingState::Start()
 	_pathfinder = new Pathfinder();
 	_pathfinder->FindPath(_startNode, _endNode);
 	_nodePath = _pathfinder->GetNodePath();
+	for (node* n : _nodePath)
+	{
+		GetWaypoint(n)->draw = true;
+	}
+
 	// set the target
 	_pathIndex = 0;
 	_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
@@ -29,21 +34,24 @@ void PathfindingState::Start()
 
 void PathfindingState::Exit()
 {
+	for (node* n : _nodePath)
+	{
+		GetWaypoint(n)->draw = false;
+	}
+
 	_waypointIndex = 0;
+	_pathIndex = 0;
 
 	delete(_pathfinder);
 	_pathfinder = nullptr;
 	delete(_trackReader);
 	_trackReader = nullptr;
+
+	_nodePath.clear();
 }
 
 void PathfindingState::Update(float deltaTime)
 {
-	for (node* n : _nodePath)
-	{
-		GetWaypoint(n)->draw = true;
-	}
-
 	static int pathCount = 1;
 	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 7.5f)
 	{
@@ -68,8 +76,21 @@ void PathfindingState::Update(float deltaTime)
 		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size() - 1);
 		_endNode = _waypoints[_waypointIndex];
 
+		for (node* n : _trackReader->GetNodeVector())
+		{
+			n->visited = false;
+			n->globalGoal = FLT_MAX;
+			n->localGoal = FLT_MAX;
+			n->parent = nullptr;
+			GetWaypoint(n)->draw = false;
+		}
 		_pathfinder->FindPath(_startNode, _endNode);
 		_nodePath = _pathfinder->GetNodePath();
+		for (node* n : _nodePath)
+		{
+			GetWaypoint(n)->draw = true;
+		}
+
 		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
 	}
@@ -83,7 +104,24 @@ void PathfindingState::DrawUI()
 		_waypointIndex = 0;
 		_startNode = _waypoints[_waypointIndex];
 		_endNode = _waypoints[++_waypointIndex];
-		_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+
+		for (node* n : _trackReader->GetNodeVector())
+		{
+			n->visited = false;
+			n->globalGoal = FLT_MAX;
+			n->localGoal = FLT_MAX;
+			n->parent = nullptr;
+			GetWaypoint(n)->draw = false;
+		}
+		_pathfinder->FindPath(_startNode, _endNode);
+		_nodePath = _pathfinder->GetNodePath();
+		for (node* n : _nodePath)
+		{
+			GetWaypoint(n)->draw = true;
+		}
+
+		_pathIndex = 0;
+		_targetPos = GetWaypoint(_nodePath[0])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
 	}
 	ImGui::Text("%.2f, %.2f", _targetPos.x, _targetPos.y);

@@ -18,6 +18,7 @@ public:
 	bool ReadFile(string filePath);
 
 	node* GetNodes() { return nodes; }
+	vector<node*> GetNodeVector();
 	vector<node*> GetWaypoints() { return waypoints; }
 private:
 	vector<node*> GetNeighbours(int x, int y);
