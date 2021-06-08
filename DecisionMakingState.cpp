@@ -94,7 +94,7 @@ void DecisionMakingState::Update(float deltaTime)
 				}
 			}
 
-			if(_lapCount == 5)
+			if(_lapCount != 5)
 			{
 				_pathIndex = 0;
 
