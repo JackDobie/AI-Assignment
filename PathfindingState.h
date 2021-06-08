@@ -10,7 +10,7 @@ class Vehicle;
 class PathfindingState : public State
 {
 public:
-	PathfindingState(Vehicle* vehicle) : State(vehicle) {}
+	PathfindingState(Vehicle* vehicle);// : State(vehicle);
 
 	void Start() override;
 
@@ -26,6 +26,7 @@ public:
 	}
 private:
 	Waypoint* GetWaypoint(node* n);
+	void ResetNodes();
 
 	vector<node*> _waypoints;
 	int _waypointIndex;
@@ -37,4 +38,6 @@ private:
 
 	Pathfinder* _pathfinder;
 	TrackReader* _trackReader;
+
+	bool _drawPath;
 };

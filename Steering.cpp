@@ -35,7 +35,10 @@ Vector2D Steering::CalculateForce(float deltaTime)
 		steeringForce = Vector2D();
 	}
 
-	return steeringForce;
+	// divide the max speed by 200 to get how much faster or slower the car is to the default
+	float turnFactor = *vehicle->GetMaxSpeed() / 200.0f;
+	// multiply steeringforce by turnfactor to speed up or slow down turning with speed
+	return steeringForce * turnFactor;
 }
 
 Vector2D Steering::Seek(Vector2D _target)
