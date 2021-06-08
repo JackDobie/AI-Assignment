@@ -2,6 +2,8 @@
 
 #include "State.h"
 #include "Vehicle.h"
+#include "Pathfinder.h"
+#include "TrackReader.h"
 
 class DecisionMakingState : public State
 {

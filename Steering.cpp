@@ -17,7 +17,7 @@ Vector2D Steering::CalculateForce(float deltaTime)
 		steeringForce = Seek(vehicle->GetTarget()) * seekWeight;
 		break;
 	case BehaviourType::flee:
-		steeringForce = Flee(vehicle->GetTarget()) * fleeWeight;
+		steeringForce = Flee(vehicle->GetOtherVehicle()->GetPositionVector()) * fleeWeight;
 		break;
 	case BehaviourType::arrive:
 		steeringForce = Arrive(vehicle->GetTarget()) * arriveWeight;
@@ -45,14 +45,23 @@ Vector2D Steering::Seek(Vector2D _target)
 {
 	// returns a steering force that directs the vehicle towards the target
 	Vector2D desiredVelocity = Vec2DNormalize(_target - vehicle->GetPositionVector()) * *vehicle->GetMaxSpeed();
-	return (desiredVelocity - *vehicle->GetVelocity());
+	return (desiredVelocity - vehicle->GetVelocity());
 }
 
 Vector2D Steering::Flee(Vector2D _target)
 {
-	//similar to seek but target and position are swapped
-	Vector2D desiredVelocity = Vec2DNormalize(vehicle->GetPositionVector() - _target) * *vehicle->GetMaxSpeed();
-	return (desiredVelocity - *vehicle->GetVelocity());
+	float dist = (_target - vehicle->GetPositionVector()).Length();
+	if (dist < 500.0f)
+	{
+		//similar to seek but target and position are swapped
+		Vector2D desiredVelocity = Vec2DNormalize(vehicle->GetPositionVector() - _target) * *vehicle->GetMaxSpeed();
+		Vector2D out = desiredVelocity - vehicle->GetVelocity();
+		return out;
+	}
+	else
+	{
+		return Vector2D(-vehicle->GetVelocity().x, -vehicle->GetVelocity().y);
+	}
 }
 
 Vector2D Steering::Arrive(Vector2D _target)
@@ -67,7 +76,7 @@ Vector2D Steering::Arrive(Vector2D _target)
 		//ensure speed does not exceed max speed
 		speed = min(speed, *vehicle->GetMaxSpeed());
 		Vector2D desiredVelocity = dir * speed / dist;
-		return (desiredVelocity - *vehicle->GetVelocity());
+		return (desiredVelocity - vehicle->GetVelocity());
 	}
 	//if distance is less than or equal to 0, do not return a force
 	return Vector2D();
@@ -176,5 +185,5 @@ Vector2D Steering::Pursuit(Vehicle* _target)
 	//if target is not in front then it will be cut off
 	float lookAheadTime = toTarget.Length() / (*vehicle->GetMaxSpeed() + _target->GetCurrentSpeed());
 
-	return Seek(_target->GetPositionVector() + *_target->GetVelocity() * lookAheadTime);
+	return Seek(_target->GetPositionVector() + _target->GetVelocity() * lookAheadTime);
 }

@@ -32,7 +32,7 @@ public:
 		int* type = (int*)&_vehicle->GetSteering()->activeType;
 
 		if (ImGui::RadioButton("None", type, 0))
-			_vehicle->GetVelocity()->Zero();
+			_vehicle->GetVelocity().Zero();
 
 		ImGui::RadioButton("Seek", type, 1);
 		ImGui::SameLine();

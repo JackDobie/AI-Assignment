@@ -57,7 +57,7 @@ public:
 
 	float GetSpeedBoostTimer() { return _speedBoostTimer; }
 
-	Vector2D* GetVelocity() { return &_velocity; }
+	Vector2D GetVelocity() { return _velocity; }
 	void SetVelocity(Vector2D newVelocity) { _velocity = newVelocity; }
 
 	Vector2D GetTarget() { return _positionTo; }
