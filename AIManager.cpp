@@ -52,6 +52,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
         return hr;
     _steeringState = new SteeringState(pCar);
     _pathfindingState = new PathfindingState(pCar);
+    _decisionMakingState = new DecisionMakingState(pCar);
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
 
@@ -60,7 +61,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     if (FAILED(hr))
         return hr;
     AICar->SetWaypoints(m_waypoints);
-    AICar->InitStateMachine(new SteeringState(AICar));
+    AICar->InitStateMachine(new PathfindingState(AICar));
     pCar->SetOtherVehicle(AICar);
 
     return hr;
@@ -260,6 +261,10 @@ void AIManager::DrawUI()
     if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
     {
         pCar->GetStateMachine()->ChangeState(_pathfindingState);
+    }
+    if (ImGui::RadioButton("Decision Making", &radioctrl, 2))
+    {
+        pCar->GetStateMachine()->ChangeState(_decisionMakingState);
     }
 
     if (ImGui::Button("Toggle waypoints"))

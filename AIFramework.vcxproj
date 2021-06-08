@@ -363,6 +363,7 @@
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="DDSTextureLoader.cpp" />
     <ClCompile Include="Debug.cpp" />
+    <ClCompile Include="DecisionMakingState.cpp" />
     <ClCompile Include="DrawableGameObject.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
@@ -389,6 +390,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DDSTextureLoader.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="DecisionMakingState.h" />
     <ClInclude Include="DrawableGameObject.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />

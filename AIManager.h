@@ -10,6 +10,7 @@
 #include "Debug.h"
 #include "SteeringState.h"
 #include "PathfindingState.h"
+#include "DecisionMakingState.h"
 
 using namespace std;
 
@@ -46,5 +47,6 @@ private:
 
 	SteeringState*			_steeringState;
 	PathfindingState*		_pathfindingState;
+	DecisionMakingState*	_decisionMakingState;
 };
 

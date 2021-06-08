@@ -40,4 +40,5 @@ private:
 	TrackReader* _trackReader;
 
 	bool _drawPath;
+	bool _resetting;
 };

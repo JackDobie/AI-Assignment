@@ -40,6 +40,7 @@
     <ClCompile Include="PathfindingState.cpp" />
     <ClCompile Include="Pathfinder.cpp" />
     <ClCompile Include="TrackReader.cpp" />
+    <ClCompile Include="DecisionMakingState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -92,6 +93,7 @@
     <ClInclude Include="PathfindingState.h" />
     <ClInclude Include="Pathfinder.h" />
     <ClInclude Include="TrackReader.h" />
+    <ClInclude Include="DecisionMakingState.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\blue.dds">

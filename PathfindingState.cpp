@@ -7,6 +7,7 @@ PathfindingState::PathfindingState(Vehicle* vehicle) : State(vehicle)
 	_endNode = nullptr;
 	_pathIndex = 0;
 	_waypointIndex = 0;
+	_resetting = false;
 	_drawPath = false;
 	_pathfinder = new Pathfinder();
 	_trackReader = new TrackReader();
@@ -107,13 +108,12 @@ void PathfindingState::DrawUI()
 	}
 	/*ImGui::Text(("Waypoint index: " + to_string(_waypointIndex)).c_str());
 	ImGui::Text(("Path index: " + to_string(_pathIndex)).c_str());*/
-	if (ImGui::Button("Reset pathfinding"))
+	if (ImGui::Button("Return to start"))
 	{
-		_waypointIndex = 0;
 		_startNode = _waypoints[_waypointIndex];
-		_endNode = _waypoints[++_waypointIndex];
+		_waypointIndex = 0;
+		_endNode = _waypoints[_waypointIndex];
 
-		ResetNodes();
 		_pathfinder->FindPath(_startNode, _endNode);
 		_nodePath = _pathfinder->GetNodePath();
 
