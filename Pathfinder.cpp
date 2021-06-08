@@ -2,7 +2,7 @@
 
 void Pathfinder::FindPath(node* startNode, node* destination)
 {
-	Reset();
+	_nodePath.clear();
 
 	// the distance between two nodes
 	auto distance = [](node* a, node* b)
@@ -73,16 +73,4 @@ void Pathfinder::FindPath(node* startNode, node* destination)
 		// reverse the vector to get the nodes in order from start to end
 		reverse(_nodePath.begin(), _nodePath.end());
 	}
-}
-
-void Pathfinder::Reset()
-{
-	for (node* n : _nodePath)
-	{
-		n->parent = nullptr;
-		n->globalGoal = FLT_MAX;
-		n->localGoal = FLT_MAX;
-		n->visited = false;
-	}
-	_nodePath.clear();
 }

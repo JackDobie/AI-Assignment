@@ -29,7 +29,7 @@ Vector2D Steering::CalculateForce(float deltaTime)
 		steeringForce = ObstacleAvoidance(vehicle->GetTarget()) * obstacleAvoidWeight;
 		break;
 	case BehaviourType::pursuit:
-		steeringForce = Pursuit(vehicle->GetOtherVehicle());
+		steeringForce = Pursuit(vehicle->GetOtherVehicle()) * pursuitWeight;
 		break;
 	default:
 		steeringForce = Vector2D();
@@ -51,7 +51,7 @@ Vector2D Steering::Seek(Vector2D _target)
 Vector2D Steering::Flee(Vector2D _target)
 {
 	float dist = (_target - vehicle->GetPositionVector()).Length();
-	if (dist < 500.0f)
+	if (dist < 400.0f)
 	{
 		//similar to seek but target and position are swapped
 		Vector2D desiredVelocity = Vec2DNormalize(vehicle->GetPositionVector() - _target) * *vehicle->GetMaxSpeed();

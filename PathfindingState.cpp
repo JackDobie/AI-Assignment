@@ -75,7 +75,7 @@ void PathfindingState::Update(float deltaTime)
 
 		// go to the next waypoint, or loop around when at the end
 		_startNode = _waypoints[_waypointIndex];
-		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size() - 1);
+		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
 		_endNode = _waypoints[_waypointIndex];
 
 		ResetNodes();
@@ -97,7 +97,6 @@ void PathfindingState::Update(float deltaTime)
 void PathfindingState::DrawUI()
 {
 	ImGui::Begin((_vehicle->GetName() + " pathfinding controls").c_str());
-	ImGui::Text("%.2f, %.2f", _targetPos.x, _targetPos.y);
 	if (ImGui::Button("Toggle path drawing"))
 	{
 		_drawPath = !_drawPath;
@@ -106,8 +105,6 @@ void PathfindingState::DrawUI()
 			GetWaypoint(n)->draw = _drawPath;
 		}
 	}
-	/*ImGui::Text(("Waypoint index: " + to_string(_waypointIndex)).c_str());
-	ImGui::Text(("Path index: " + to_string(_pathIndex)).c_str());*/
 	if (ImGui::Button("Return to start"))
 	{
 		_startNode = _waypoints[_waypointIndex];
@@ -137,6 +134,7 @@ void PathfindingState::ResetNodes()
 		n->globalGoal = FLT_MAX;
 		n->localGoal = FLT_MAX;
 		n->parent = nullptr;
-		GetWaypoint(n)->draw = false;
+		if(_drawPath)
+			GetWaypoint(n)->draw = false;
 	}
 }

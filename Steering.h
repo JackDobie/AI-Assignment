@@ -45,6 +45,7 @@ private:
     float obstacleAvoidWeight = 25.0f;
 
     Vector2D Pursuit(Vehicle* _target);
+    float pursuitWeight = 2.0f;
 
     // the vehicle using this steering
     Vehicle* vehicle;
