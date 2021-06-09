@@ -47,6 +47,8 @@ protected:
 	bool _overtaking = false;
 
 	PickupItem* _pickUpItem;
+
+	bool _active;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
@@ -114,5 +116,8 @@ public:
 
 	PickupItem* GetPickUpItem() { return _pickUpItem; }
 	void SetPickUpItem(PickupItem* pickup) { _pickUpItem = pickup; }
+
+	bool GetActive() { return _active; }
+	void SetActive(bool active) { _active = active; }
 };
 

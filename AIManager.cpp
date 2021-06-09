@@ -56,6 +56,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
     pCar->SetPickUpItem(pPickup);
+    pCar->SetActive(true);
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
@@ -67,6 +68,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     AICar->InitStateMachine(_AIPathfindingState);
     AICar->SetOtherVehicle(pCar);
     AICar->SetPickUpItem(pPickup);
+    AICar->SetActive(true);
     pCar->SetOtherVehicle(AICar);
 
     return hr;
@@ -111,12 +113,14 @@ void AIManager::update(const float fDeltaTime)
     AddItemToDrawList(pPickup);
 
     pCar->Update(fDeltaTime);
-    AICar->Update(fDeltaTime);
+    if(AICar->GetActive())
+        AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
     AddItemToDrawList(pCar);
-    AddItemToDrawList(AICar);
+    if (AICar->GetActive())
+        AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)
@@ -178,6 +182,11 @@ void AIManager::checkForCollisions()
     {
         pPickup->Collide();
         pCar->Boost();
+    }
+    if (boundingSphereAICar->Intersects(boundingSpherePU))
+    {
+        pPickup->Collide();
+        AICar->Boost();
     }
 
     // if the two cars collide
@@ -265,16 +274,19 @@ void AIManager::DrawUI()
     {
         pCar->GetStateMachine()->ChangeState(_steeringState);
         AICar->GetStateMachine()->ChangeState(_AIPathfindingState);
+        AICar->SetActive(false);
     }
     if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
     {
         pCar->GetStateMachine()->ChangeState(_pathfindingState);
         AICar->GetStateMachine()->ChangeState(_AIPathfindingState);
+        AICar->SetActive(false);
     }
     if (ImGui::RadioButton("Decision Making", &radioctrl, 2))
     {
         pCar->GetStateMachine()->ChangeState(_decisionMakingState);
         AICar->GetStateMachine()->ChangeState(_AIDecisionMakingState);
+        AICar->SetActive(true);
     }
 
     if (ImGui::Button("Toggle waypoints"))

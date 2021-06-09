@@ -12,6 +12,7 @@ PathfindingState::PathfindingState(Vehicle* vehicle) : State(vehicle)
 	_pathfinder = new Pathfinder();
 	_trackReader = new TrackReader();
 	_trackReader->ReadFile("Resources/waypoints.txt");
+	_distanceToHitNode = _distanceToHitNodeDefault;
 }
 
 void PathfindingState::Start()
@@ -25,7 +26,6 @@ void PathfindingState::Start()
 	_endNode = _waypoints[++_waypointIndex];
 	// move vehicle to the first waypoint
 	Vector2D startPos = GetWaypoint(_startNode)->GetPositionVector();
-	//// add a offset to y to avoid multiple vehicles starting in exact same position
 	_vehicle->SetVehiclePosition(startPos);
 	// calculate a path to the next waypoint
 	_pathfinder->FindPath(_startNode, _endNode);
@@ -52,14 +52,25 @@ void PathfindingState::Exit()
 
 	_waypointIndex = 0;
 	_pathIndex = 0;
+	_distanceToHitNode = _distanceToHitNodeDefault;
 
 	_nodePath.clear();
 }
 
 void PathfindingState::Update(float deltaTime)
 {
+	// if the other vehicle has crashed, increase the distance to hit a node to allow for easier overtakes
+	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() < 1.0f)
+	{
+		_distanceToHitNode = _distanceToHitNodeBoost;
+	}
+	else
+	{
+		_distanceToHitNode = _distanceToHitNodeDefault;
+	}
+
 	// compare distance to check if got in range of the next node
-	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
+	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < _distanceToHitNode)
 	{
 		// if this isn't the last node in the path, set target to the next node
 		if (_pathIndex < _nodePath.size() - 1)
@@ -71,7 +82,7 @@ void PathfindingState::Update(float deltaTime)
 	}
 
 	// compare distance to check if got in range of the waypoint
-	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 20.0f)
+	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < _distanceToHitNode)
 	{
 		_pathIndex = 0;
 

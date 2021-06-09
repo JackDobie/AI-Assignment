@@ -124,11 +124,12 @@ void DecisionMakingState::Update(float deltaTime)
 
 		if (_movingToPickUp)
 		{
-			if (Vec2DDistance(_vehicle->GetPositionVector(), _targetPos) < 20.0f)
+			if (Vec2DDistance(_vehicle->GetPositionVector(), _targetPos) < 50.0f)
 			{
 				_movingToPickUp = false;
 
 				_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+				_vehicle->SetPositionTo(_targetPos);
 			}
 		}
 		else
@@ -195,6 +196,7 @@ void DecisionMakingState::DrawUI()
 	}
 	ImGui::Text((to_string(_vehicle->_waypointCount)).c_str());
 	ImGui::Text(("Overtaking: " + to_string(_overtaking)).c_str());
+	ImGui::Text(("Moving to pickup: " + to_string(_movingToPickUp)).c_str());
 	ImGui::End();
 }
 

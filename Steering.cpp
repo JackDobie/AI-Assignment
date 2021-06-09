@@ -15,28 +15,35 @@ Vector2D Steering::CalculateForce(float deltaTime)
 	{
 	case BehaviourType::seek:
 		steeringForce = Seek(vehicle->GetTarget()) * seekWeight;
+		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::flee:
 		steeringForce = Flee(vehicle->GetOtherVehicle()->GetPositionVector()) * fleeWeight;
+		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	case BehaviourType::arrive:
 		steeringForce = Arrive(vehicle->GetTarget()) * arriveWeight;
+		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::wander:
 		steeringForce = Wander(deltaTime);
+		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::obstacle_avoidance:
 		steeringForce = ObstacleAvoidance(vehicle->GetTarget()) * obstacleAvoidWeight;
+		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	case BehaviourType::pursuit:
 		steeringForce = Pursuit(vehicle->GetOtherVehicle()) * pursuitWeight;
+		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	default:
+		vehicle->GetOtherVehicle()->SetActive(false);
 		steeringForce = Vector2D();
 	}
 
 	// divide the max speed by 200 to get how much faster or slower the car is to the default
-	float turnFactor = *vehicle->GetMaxSpeed() / 250.0f;
+	float turnFactor = *vehicle->GetMaxSpeed() / 225.0f;
 	// multiply steeringforce by turnfactor to speed up or slow down turning with speed
 	return steeringForce * turnFactor;
 }
