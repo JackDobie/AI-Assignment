@@ -4,6 +4,7 @@
 #include "Vehicle.h"
 #include "Pathfinder.h"
 #include "TrackReader.h"
+#include "PickupItem.h"
 
 class DecisionMakingState : public State
 {
@@ -26,6 +27,9 @@ private:
 	Waypoint* GetWaypoint(node* n);
 	void ResetNodes();
 
+	void NextNode();
+	void NextWaypoint();
+
 	vector<node*> _waypoints;
 	int _waypointIndex;
 	int _pathIndex;
@@ -45,4 +49,6 @@ private:
 	bool _finished;
 
 	bool _overtaking;
+
+	bool _movingToPickUp;
 };

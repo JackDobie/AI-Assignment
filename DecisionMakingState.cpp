@@ -6,6 +6,7 @@ static int carsWithThis = 0;
 
 DecisionMakingState::DecisionMakingState(Vehicle* v) : State(v)
 {
+	_movingToPickUp = false;
 	_overtaking = false;
 	_finished = false;
 	_startNode = nullptr;
@@ -75,6 +76,7 @@ void DecisionMakingState::Exit()
 	_lapCount = 0;
 	_finished = false;
 	_overtaking = false;
+	_movingToPickUp = false;
 
 	_nodePath.clear();
 }
@@ -95,78 +97,52 @@ void DecisionMakingState::Update(float deltaTime)
 		}
 		else if (_vehicle->_waypointCount == _vehicle->GetOtherVehicle()->_waypointCount)
 		{
-			if (_vehicle->_pathIndex == _vehicle->GetOtherVehicle()->_pathIndex)
+			if (_vehicle->_pathIndex < _vehicle->GetOtherVehicle()->_pathIndex)
 			{
 				_overtaking = true;
 			}
+			else
+			{
+				_overtaking = false;
+			}
 		}
 
-		// if wanting to overtake, go directly to the end node instead of following path to go around track faster
-		if (_overtaking)
+		if (_movingToPickUp)
 		{
-			_vehicle->SetPositionTo(GetWaypoint(_endNode)->GetPositionVector());
+			if (Vec2DDistance(_vehicle->GetPositionVector(), _targetPos) < 20.0f)
+			{
+				_movingToPickUp = false;
+
+				_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+			}
 		}
 		else
 		{
-			// compare distance to check if got in range of the next node
-			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
+			if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetPickUpItem()->GetPositionVector()) <
+				Vec2DDistance(_vehicle->GetPositionVector(), _targetPos))
 			{
-				// if this isn't the last node in the path, set target to the next node
-				if (_pathIndex < _nodePath.size() - 1)
-				{
-					_pathIndex++;
-					_vehicle->_pathIndex = _pathIndex;
-					_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
-					_vehicle->SetPositionTo(_targetPos);
-				}
+				_movingToPickUp = true;
 			}
-		}
 
-		// compare distance to check if got in range of the waypoint
-		if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < (_overtaking ? 120.0f : 20.0f))
-		{
-			// if vehicle went from the end waypoint hit the starting waypoint to complete a lap
-			if (_startNode == _waypoints[14] && _endNode == _waypoints[0])
+			// if wanting to overtake, go directly to the end node instead of following path to go around track faster
+			if (_overtaking)
 			{
-				if (++_lapCount == 5)
+				_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+				_vehicle->SetPositionTo(GetWaypoint(_endNode)->GetPositionVector());
+			}
+			else
+			{
+				// compare distance to check if got in range of the next node
+				if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
 				{
-					_finished = true;
-
-					// set a stopping position with a random offset between 300-500 x and 100-300 y
-					_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + (rand() % (500 - 300 + 1) + 300);
-					_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (300 - 100 + 1) + 100);
-					_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);
-					// slow down to a stop
-					_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
-					_vehicle->SetPositionTo(_targetPos);
+					NextNode();
 				}
 			}
 
-			if(_lapCount != 5)
+			// compare distance to check if got in range of the waypoint
+			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < (_overtaking ? 120.0f : 20.0f))
 			{
-				_overtaking = false;
-
-				_pathIndex = 0;
-
-				// go to the next waypoint, or loop around when at the end
-				_startNode = _waypoints[_waypointIndex];
-				_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
-				_vehicle->_waypointCount = _waypointIndex;
-				_endNode = _waypoints[_waypointIndex];
-
-				ResetNodes();
-				_pathfinder->FindPath(_startNode, _endNode);
-				_nodePath = _pathfinder->GetNodePath();
-				if (_drawPath)
-				{
-					for (node* n : _nodePath)
-					{
-						GetWaypoint(n)->draw = true;
-					}
-				}
-
-				_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
-				_vehicle->SetPositionTo(_targetPos);
+				NextWaypoint();
 			}
 		}
 	}
@@ -222,5 +198,65 @@ void DecisionMakingState::ResetNodes()
 		n->parent = nullptr;
 		if (_drawPath)
 			GetWaypoint(n)->draw = false;
+	}
+}
+
+void DecisionMakingState::NextNode()
+{
+	// if this isn't the last node in the path, set target to the next node
+	if (_pathIndex < _nodePath.size() - 1)
+	{
+		_pathIndex++;
+		_vehicle->_pathIndex = _pathIndex;
+		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
+		_vehicle->SetPositionTo(_targetPos);
+	}
+}
+
+void DecisionMakingState::NextWaypoint()
+{
+	// if vehicle went from the end waypoint hit the starting waypoint to complete a lap
+	if (_startNode == _waypoints[14] && _endNode == _waypoints[0])
+	{
+		// increase lap count then finish when at 5 laps
+		if (++_lapCount == 5)
+		{
+			_finished = true;
+
+			// set a stopping position with a random offset between 300-500 x and 100-300 y
+			_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + (rand() % (500 - 300 + 1) + 300);
+			_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (300 - 100 + 1) + 100);
+			_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);
+			// slow down to a stop
+			_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
+			_vehicle->SetPositionTo(_targetPos);
+		}
+	}
+
+	if (_lapCount != 5)
+	{
+		_overtaking = false;
+
+		_pathIndex = 0;
+
+		// go to the next waypoint, or loop around when at the end
+		_startNode = _waypoints[_waypointIndex];
+		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
+		_vehicle->_waypointCount = _waypointIndex;
+		_endNode = _waypoints[_waypointIndex];
+
+		ResetNodes();
+		_pathfinder->FindPath(_startNode, _endNode);
+		_nodePath = _pathfinder->GetNodePath();
+		if (_drawPath)
+		{
+			for (node* n : _nodePath)
+			{
+				GetWaypoint(n)->draw = true;
+			}
+		}
+
+		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
+		_vehicle->SetPositionTo(_targetPos);
 	}
 }

@@ -55,6 +55,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     _decisionMakingState = new DecisionMakingState(pCar);
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
+    pCar->SetPickUpItem(pPickup);
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
@@ -64,8 +65,9 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     _AIDecisionMakingState = new DecisionMakingState(AICar);
     AICar->SetWaypoints(m_waypoints);
     AICar->InitStateMachine(_AIPathfindingState);
-    pCar->SetOtherVehicle(AICar);
     AICar->SetOtherVehicle(pCar);
+    AICar->SetPickUpItem(pPickup);
+    pCar->SetOtherVehicle(AICar);
 
     return hr;
 }

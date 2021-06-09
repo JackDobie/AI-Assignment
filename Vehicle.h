@@ -45,6 +45,8 @@ protected:
 	BoundingSphere* _boundingSphere;
 
 	bool _overtaking = false;
+
+	PickupItem* _pickUpItem;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
@@ -109,5 +111,8 @@ public:
 
 	bool GetOvertaking() { return _overtaking; }
 	void SetOvertaking(bool overtaking) { _overtaking = overtaking; }
+
+	PickupItem* GetPickUpItem() { return _pickUpItem; }
+	void SetPickUpItem(PickupItem* pickup) { _pickUpItem = pickup; }
 };
 
