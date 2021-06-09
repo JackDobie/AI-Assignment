@@ -81,6 +81,7 @@ void DecisionMakingState::Exit()
 
 void DecisionMakingState::Update(float deltaTime)
 {
+	_vehicle->SetOvertaking(_overtaking);
 	// if done five laps
 	if (_finished)
 	{
@@ -100,6 +101,7 @@ void DecisionMakingState::Update(float deltaTime)
 			}
 		}
 
+		// if wanting to overtake, go directly to the end node instead of following path to go around track faster
 		if (_overtaking)
 		{
 			_vehicle->SetPositionTo(GetWaypoint(_endNode)->GetPositionVector());
@@ -121,7 +123,7 @@ void DecisionMakingState::Update(float deltaTime)
 		}
 
 		// compare distance to check if got in range of the waypoint
-		if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < 20.0f)
+		if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < (_overtaking ? 120.0f : 20.0f))
 		{
 			// if vehicle went from the end waypoint hit the starting waypoint to complete a lap
 			if (_startNode == _waypoints[14] && _endNode == _waypoints[0])
@@ -130,6 +132,7 @@ void DecisionMakingState::Update(float deltaTime)
 				{
 					_finished = true;
 
+					// set a stopping position with a random offset between 300-500 x and 100-300 y
 					_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + (rand() % (500 - 300 + 1) + 300);
 					_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (300 - 100 + 1) + 100);
 					_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);

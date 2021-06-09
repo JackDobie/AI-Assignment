@@ -148,26 +148,12 @@ void AIManager::keyPress(WPARAM param)
     }
 }
 
-bool AIManager::checkForCollisions()
+void AIManager::checkForCollisions()
 {
-
     XMVECTOR dummy;
 
-    // the car
-    XMVECTOR carPos;
-    XMVECTOR carScale;
-    XMMatrixDecompose(
-        &carScale,
-        &dummy,
-        &carPos,
-        XMLoadFloat4x4(pCar->getTransform())
-    );
-
-    XMFLOAT3 scale;
-    XMStoreFloat3(&scale, carScale);
-    BoundingSphere boundingSphereCar;
-    XMStoreFloat3(&boundingSphereCar.Center, carPos);
-    boundingSphereCar.Radius = scale.x;
+    BoundingSphere* boundingSphereCar = pCar->GetBoundingSphere();
+    BoundingSphere* boundingSphereAICar = AICar->GetBoundingSphere();
 
     // check for collision with pickups
     XMVECTOR puPos;
@@ -179,20 +165,36 @@ bool AIManager::checkForCollisions()
         XMLoadFloat4x4(pPickup->getTransform())
     );
 
+    XMFLOAT3 scale;
     XMStoreFloat3(&scale, puScale);
     BoundingSphere boundingSpherePU;
     XMStoreFloat3(&boundingSpherePU.Center, puPos);
     boundingSpherePU.Radius = scale.x;
 
-    // if the two bounding spheres collide
-    if (boundingSphereCar.Intersects(boundingSpherePU))
+    // if the player collides with a pickup
+    if (boundingSphereCar->Intersects(boundingSpherePU))
     {
         pPickup->Collide();
         pCar->Boost();
-        return true;
     }
 
-    return false;
+    // if the two cars collide
+    if (boundingSphereCar->Intersects(*boundingSphereAICar))
+    {
+        // if in decision making mode, both cars can crash. the car that is overtaking will get the penalty
+        // outside of decision making mode, only the player will get the penalty
+        if (pCar->GetStateMachine()->GetCurrentState()->GetCurrentState() == 2)
+        {
+            if (pCar->GetOvertaking())
+                pCar->Collide();
+            else
+                AICar->Collide();
+        }
+        else
+        {
+            pCar->Collide();
+        }
+    }
 }
 
 Waypoint* AIManager::GetWaypoint(int x, int y)

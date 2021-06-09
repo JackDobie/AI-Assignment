@@ -36,7 +36,7 @@ public:
 
 	void					DrawUI();
 private:
-	bool					checkForCollisions();
+	void					checkForCollisions();
 
 	vecWaypoints            m_waypoints;
 	PickupItem*				pPickup;

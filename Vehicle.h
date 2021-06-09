@@ -36,10 +36,15 @@ protected:
 
 	float _speedFactor;
 	float _speedBoostTimer;
+	float _crashTimer;
 
 	StateMachine* _stateMachine;
 
 	vector<Waypoint*> _waypoints;
+
+	BoundingSphere* _boundingSphere;
+
+	bool _overtaking = false;
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
@@ -56,6 +61,7 @@ public:
 	void SetCurrentSpeed(const float speed); // a ratio: a value between 0 and 1 (1 being max speed)
 
 	float GetSpeedBoostTimer() { return _speedBoostTimer; }
+	float GetCrashTimer() { return _crashTimer; }
 
 	Vector2D GetVelocity() { return _velocity; }
 	void SetVelocity(Vector2D newVelocity) { _velocity = newVelocity; }
@@ -94,5 +100,14 @@ public:
 
 	int _waypointCount = 0;
 	int _pathIndex = 0;
+
+	XMFLOAT3 GetScale() { return m_scale; }
+
+	BoundingSphere* GetBoundingSphere() { return _boundingSphere; }
+
+	void Collide();
+
+	bool GetOvertaking() { return _overtaking; }
+	void SetOvertaking(bool overtaking) { _overtaking = overtaking; }
 };
 

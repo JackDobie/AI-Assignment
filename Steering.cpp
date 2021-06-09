@@ -111,20 +111,10 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 	Vehicle* closestObstacle = nullptr;
 	Vector2D closestObstacleLocalPos = Vector2D();
 
-	XMVECTOR dummy;
-	XMVECTOR carPos;
-	XMVECTOR carScale;
-	XMMatrixDecompose(
-		&carScale,
-		&dummy,
-		&carPos,
-		XMLoadFloat4x4(vehicle->getTransform())
-	);
-	XMFLOAT3 scale;
-	XMStoreFloat3(&scale, carScale);
+	float avoidScale = 1.4f;
 
-	float aRadius = scale.x * 1.1f;
-	float bRadius = scale.x * 1.1f;
+	float aRadius = vehicle->GetScale().x * avoidScale;
+	float bRadius = vehicle->GetOtherVehicle()->GetScale().x * avoidScale;
 
 	Vector2D otherPos = otherVeh->GetPositionVector();
 

@@ -8,6 +8,9 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	_currentSpeed = _maxSpeed;
 	_lastPosition = startPos;
 	_speedFactor = 1.0f;
+	_speedBoostTimer = 0.0f;
+	_crashTimer = 0.0f;
+	_boundingSphere = new BoundingSphere(XMFLOAT3(0,0,0), 1);
 }
 
 HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
@@ -36,9 +39,15 @@ void Vehicle::Update(float deltaTime)
 		{
 			_speedBoostTimer -= deltaTime;
 		}
-		else
+		if (_crashTimer > 0.0f)
+		{
+			_crashTimer -= deltaTime;
+		}
+
+		if(_speedBoostTimer <= 0.0f && _crashTimer <= 0.0f)
 		{
 			_speedBoostTimer = 0.0f;
+			_crashTimer = 0.0f;
 			_speedFactor = 1.0f;
 		}
 	}
@@ -67,8 +76,8 @@ void Vehicle::Update(float deltaTime)
 	_forward = Vector2D(cosf(m_radianRotation), sinf(m_radianRotation));
 	_side = _forward.Perp();
 
-	//loop around screen, but only if in steering state
-	if (_stateMachine->GetCurrentState()->GetCurrentState() == 0)
+	//loop around screen, but only if in steering state and not pursuing
+	if (_stateMachine->GetCurrentState()->GetCurrentState() == 0 && _steering->activeType != Steering::BehaviourType::pursuit)
 	{
 		int Wmin = (SCREEN_WIDTH * 0.5f) - SCREEN_WIDTH;
 		int Wmax = SCREEN_WIDTH - (SCREEN_WIDTH * 0.5f);
@@ -87,7 +96,10 @@ void Vehicle::Update(float deltaTime)
 	}
 
 	// set the current poistion for the drawablegameobject
-	setPosition(XMFLOAT3((float)_currentPosition.x, (float)_currentPosition.y, 0));
+	setPosition(XMFLOAT3((float)_currentPosition.x, (float)_currentPosition.y, 0.0f));
+
+	_boundingSphere->Radius = m_scale.x;
+	_boundingSphere->Center = XMFLOAT3(_currentPosition.x, _currentPosition.y, 0.0f);
 
 	DrawableGameObject::update(deltaTime);
 }
@@ -130,6 +142,10 @@ void Vehicle::DrawUI()
 	{
 		ImGui::Text("Speed boost! Time remaining: %.3f", _speedBoostTimer);
 	}
+	if (_crashTimer > 0.0f)
+	{
+		ImGui::Text("Crash! Time remaining: %.3f", _crashTimer);
+	}
 	ImGui::End();
 
 	_stateMachine->DrawUI();
@@ -159,4 +175,15 @@ Waypoint* Vehicle::GetWaypoint(int x, int y)
 		w = _waypoints[index];
 	}
 	return w;
+}
+
+void Vehicle::Collide()
+{
+	// only collide if the car is in pursuit mode or decision making state
+	if (_steering->activeType == Steering::BehaviourType::pursuit || _stateMachine->GetCurrentState()->GetCurrentState() == 2)
+	{
+		// the vehicle has hit another vehicle so suffers a great speed penalty
+		_speedFactor = 0.5f;
+		_crashTimer = 3.0f;
+	}
 }
