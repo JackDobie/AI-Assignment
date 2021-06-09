@@ -124,8 +124,16 @@ void PathfindingState::DrawUI()
 		_waypointIndex = 0;
 		_endNode = _waypoints[_waypointIndex];
 
+		ResetNodes();
 		_pathfinder->FindPath(_startNode, _endNode);
 		_nodePath = _pathfinder->GetNodePath();
+		if (_drawPath)
+		{
+			for (node* n : _nodePath)
+			{
+				GetWaypoint(n)->draw = true;
+			}
+		}
 
 		_pathIndex = 0;
 		_targetPos = GetWaypoint(_nodePath[0])->GetPositionVector();

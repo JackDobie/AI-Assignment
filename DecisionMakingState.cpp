@@ -167,8 +167,9 @@ void DecisionMakingState::Update(float deltaTime)
 void DecisionMakingState::DrawUI()
 {
 	ImGui::Begin((_vehicle->GetName() + " decision making controls").c_str());
-	ImGui::Text(("Waypoint index: " + to_string(_waypointIndex)).c_str());
 	ImGui::Text(("Laps: " + to_string(_lapCount)).c_str());
+	string overtaking = (_overtaking ? "true" : "false");
+	ImGui::Text(("Overtaking: " + overtaking).c_str());
 	if (ImGui::Button("Toggle path drawing"))
 	{
 		_drawPath = !_drawPath;
@@ -186,17 +187,22 @@ void DecisionMakingState::DrawUI()
 		_waypointIndex = 0;
 		_endNode = _waypoints[_waypointIndex];
 
+		ResetNodes();
 		_pathfinder->FindPath(_startNode, _endNode);
 		_nodePath = _pathfinder->GetNodePath();
+		if (_drawPath)
+		{
+			for (node* n : _nodePath)
+			{
+				GetWaypoint(n)->draw = true;
+			}
+		}
 
 		_pathIndex = 0;
 		_targetPos = GetWaypoint(_nodePath[0])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
 		_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	}
-	ImGui::Text((to_string(_vehicle->_waypointCount)).c_str());
-	ImGui::Text(("Overtaking: " + to_string(_overtaking)).c_str());
-	ImGui::Text(("Moving to pickup: " + to_string(_movingToPickUp)).c_str());
 	ImGui::End();
 }
 
