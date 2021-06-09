@@ -88,7 +88,17 @@ void DecisionMakingState::Update(float deltaTime)
 	}
 	else
 	{
-		_overtaking = (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 100.0f);
+		if (_vehicle->_waypointCount < _vehicle->GetOtherVehicle()->_waypointCount)
+		{
+			_overtaking = true;
+		}
+		else if (_vehicle->_waypointCount == _vehicle->GetOtherVehicle()->_waypointCount)
+		{
+			if (_vehicle->_pathIndex == _vehicle->GetOtherVehicle()->_pathIndex)
+			{
+				_overtaking = true;
+			}
+		}
 
 		if (_overtaking)
 		{
@@ -103,6 +113,7 @@ void DecisionMakingState::Update(float deltaTime)
 				if (_pathIndex < _nodePath.size() - 1)
 				{
 					_pathIndex++;
+					_vehicle->_pathIndex = _pathIndex;
 					_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 					_vehicle->SetPositionTo(_targetPos);
 				}
@@ -118,8 +129,9 @@ void DecisionMakingState::Update(float deltaTime)
 				if (++_lapCount == 5)
 				{
 					_finished = true;
-					_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + 400.0f;
-					_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - 200.0f;
+
+					_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + (rand() % (500 - 300 + 1) + 300);
+					_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (300 - 100 + 1) + 100);
 					_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);
 					// slow down to a stop
 					_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
@@ -136,6 +148,7 @@ void DecisionMakingState::Update(float deltaTime)
 				// go to the next waypoint, or loop around when at the end
 				_startNode = _waypoints[_waypointIndex];
 				_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
+				_vehicle->_waypointCount = _waypointIndex;
 				_endNode = _waypoints[_waypointIndex];
 
 				ResetNodes();
@@ -186,6 +199,8 @@ void DecisionMakingState::DrawUI()
 		_vehicle->SetPositionTo(_targetPos);
 		_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	}
+	ImGui::Text((to_string(_vehicle->_waypointCount)).c_str());
+	ImGui::Text(("Overtaking: " + to_string(_overtaking)).c_str());
 	ImGui::End();
 }
 

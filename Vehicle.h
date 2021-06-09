@@ -91,5 +91,8 @@ public:
 	Waypoint* GetWaypoint(int x, int y);
 	vector<Waypoint*> GetWaypoints() { return _waypoints; }
 	void SetWaypoints(vector<Waypoint*> newWaypoints) { _waypoints = newWaypoints; }
+
+	int _waypointCount = 0;
+	int _pathIndex = 0;
 };
 
