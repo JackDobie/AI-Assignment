@@ -1,7 +1,12 @@
 #include "DecisionMakingState.h"
 
+// used to count how many vehicles have decisionmakingstate
+// static and added to when a new vehicle uses this state, then taken from on exit.
+static int carsWithThis = 0;
+
 DecisionMakingState::DecisionMakingState(Vehicle* v) : State(v)
 {
+	_overtaking = false;
 	_finished = false;
 	_startNode = nullptr;
 	_endNode = nullptr;
@@ -26,7 +31,18 @@ void DecisionMakingState::Start()
 	_startNode = _waypoints[_waypointIndex];
 	_endNode = _waypoints[++_waypointIndex];
 	// move vehicle to the first waypoint
-	_vehicle->SetVehiclePosition(GetWaypoint(_startNode)->GetPositionVector());
+	Vector2D startPos = GetWaypoint(_startNode)->GetPositionVector();
+	// add a offset to avoid multiple vehicles starting in exact same position
+	if (++carsWithThis == 1)
+	{
+		startPos.x -= 200.0f;
+		startPos.y += 40.0f;
+	}
+	else
+	{
+		startPos.y -= 50.0f;
+	}
+	_vehicle->SetVehiclePosition(startPos);
 	// calculate a path to the next waypoint
 	_pathfinder->FindPath(_startNode, _endNode);
 	_nodePath = _pathfinder->GetNodePath();
@@ -44,16 +60,21 @@ void DecisionMakingState::Start()
 	// set the vehicle to seek to the first node in the path
 	_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	_vehicle->SetPositionTo(_targetPos);
+	//_vehicle->GetOtherVehicle()->GetStateMachine()->GetCurrentState()->Exit();
+	//_vehicle->GetOtherVehicle()->GetStateMachine()->GetCurrentState()->Start();
 }
 
 void DecisionMakingState::Exit()
 {
+	carsWithThis--;
+
 	ResetNodes();
 
 	_waypointIndex = 0;
 	_pathIndex = 0;
 	_lapCount = 0;
 	_finished = false;
+	_overtaking = false;
 
 	_nodePath.clear();
 }
@@ -63,22 +84,28 @@ void DecisionMakingState::Update(float deltaTime)
 	// if done five laps
 	if (_finished)
 	{
-		_targetPos.x = _vehicle->GetPositionVector().x + 200.0f;
-		_targetPos.y = _vehicle->GetPositionVector().y;
-		// slow down to a stop
-		_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
+
 	}
 	else
 	{
-		// compare distance to check if got in range of the next node
-		if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
+		_overtaking = (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 100.0f);
+
+		if (_overtaking)
 		{
-			// if this isn't the last node in the path, set target to the next node
-			if (_pathIndex < _nodePath.size() - 1)
+			_vehicle->SetPositionTo(GetWaypoint(_endNode)->GetPositionVector());
+		}
+		else
+		{
+			// compare distance to check if got in range of the next node
+			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
 			{
-				_pathIndex++;
-				_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
-				_vehicle->SetPositionTo(_targetPos);
+				// if this isn't the last node in the path, set target to the next node
+				if (_pathIndex < _nodePath.size() - 1)
+				{
+					_pathIndex++;
+					_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
+					_vehicle->SetPositionTo(_targetPos);
+				}
 			}
 		}
 
@@ -91,11 +118,19 @@ void DecisionMakingState::Update(float deltaTime)
 				if (++_lapCount == 5)
 				{
 					_finished = true;
+					_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + 400.0f;
+					_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - 200.0f;
+					_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);
+					// slow down to a stop
+					_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
+					_vehicle->SetPositionTo(_targetPos);
 				}
 			}
 
 			if(_lapCount != 5)
 			{
+				_overtaking = false;
+
 				_pathIndex = 0;
 
 				// go to the next waypoint, or loop around when at the end
@@ -139,7 +174,7 @@ void DecisionMakingState::DrawUI()
 		_lapCount = 0;
 		_finished = false;
 
-		_startNode = _waypoints[_waypointIndex];
+		_startNode = _nodePath[_pathIndex];
 		_waypointIndex = 0;
 		_endNode = _waypoints[_waypointIndex];
 
@@ -149,6 +184,7 @@ void DecisionMakingState::DrawUI()
 		_pathIndex = 0;
 		_targetPos = GetWaypoint(_nodePath[0])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
+		_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	}
 	ImGui::End();
 }

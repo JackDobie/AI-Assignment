@@ -48,5 +48,8 @@ private:
 	SteeringState*			_steeringState;
 	PathfindingState*		_pathfindingState;
 	DecisionMakingState*	_decisionMakingState;
+
+	PathfindingState*		_AIPathfindingState;
+	DecisionMakingState*	_AIDecisionMakingState;
 };
 

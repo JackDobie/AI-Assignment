@@ -43,4 +43,6 @@ private:
 
 	int _lapCount;
 	bool _finished;
+
+	bool _overtaking;
 };

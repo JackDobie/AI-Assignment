@@ -67,21 +67,24 @@ void Vehicle::Update(float deltaTime)
 	_forward = Vector2D(cosf(m_radianRotation), sinf(m_radianRotation));
 	_side = _forward.Perp();
 
-	//loop around screen
-	int Wmin = (SCREEN_WIDTH * 0.5f) - SCREEN_WIDTH;
-	int Wmax = SCREEN_WIDTH - (SCREEN_WIDTH * 0.5f);
-	int Hmin = (SCREEN_HEIGHT * 0.5f) - SCREEN_HEIGHT;
-	int Hmax = SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.5f);
+	//loop around screen, but only if in steering state
+	if (_stateMachine->GetCurrentState()->GetCurrentState() == 0)
+	{
+		int Wmin = (SCREEN_WIDTH * 0.5f) - SCREEN_WIDTH;
+		int Wmax = SCREEN_WIDTH - (SCREEN_WIDTH * 0.5f);
+		int Hmin = (SCREEN_HEIGHT * 0.5f) - SCREEN_HEIGHT;
+		int Hmax = SCREEN_HEIGHT - (SCREEN_HEIGHT * 0.5f);
 
-	if (_currentPosition.x < Wmin)
-		_currentPosition.x = Wmax;
-	else if (_currentPosition.x > Wmax)
-		_currentPosition.x = Wmin;
+		if (_currentPosition.x < Wmin)
+			_currentPosition.x = Wmax;
+		else if (_currentPosition.x > Wmax)
+			_currentPosition.x = Wmin;
 
-	if (_currentPosition.y < Hmin)
-		_currentPosition.y = Hmax;
-	else if (_currentPosition.y > Hmax)
-		_currentPosition.y = Hmin;
+		if (_currentPosition.y < Hmin)
+			_currentPosition.y = Hmax;
+		else if (_currentPosition.y > Hmax)
+			_currentPosition.y = Hmin;
+	}
 
 	// set the current poistion for the drawablegameobject
 	setPosition(XMFLOAT3((float)_currentPosition.x, (float)_currentPosition.y, 0));

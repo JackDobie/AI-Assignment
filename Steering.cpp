@@ -36,7 +36,7 @@ Vector2D Steering::CalculateForce(float deltaTime)
 	}
 
 	// divide the max speed by 200 to get how much faster or slower the car is to the default
-	float turnFactor = *vehicle->GetMaxSpeed() / 200.0f;
+	float turnFactor = *vehicle->GetMaxSpeed() / 250.0f;
 	// multiply steeringforce by turnfactor to speed up or slow down turning with speed
 	return steeringForce * turnFactor;
 }
@@ -123,8 +123,8 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 	XMFLOAT3 scale;
 	XMStoreFloat3(&scale, carScale);
 
-	float aRadius = scale.x * 1.2f;
-	float bRadius = scale.x * 1.2f;
+	float aRadius = scale.x * 1.1f;
+	float bRadius = scale.x * 1.1f;
 
 	Vector2D otherPos = otherVeh->GetPositionVector();
 

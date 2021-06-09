@@ -24,7 +24,9 @@ void PathfindingState::Start()
 	_startNode = _waypoints[_waypointIndex];
 	_endNode = _waypoints[++_waypointIndex];
 	// move vehicle to the first waypoint
-	_vehicle->SetVehiclePosition(GetWaypoint(_startNode)->GetPositionVector());
+	Vector2D startPos = GetWaypoint(_startNode)->GetPositionVector();
+	//// add a offset to y to avoid multiple vehicles starting in exact same position
+	_vehicle->SetVehiclePosition(startPos);
 	// calculate a path to the next waypoint
 	_pathfinder->FindPath(_startNode, _endNode);
 	_nodePath = _pathfinder->GetNodePath();
@@ -107,7 +109,7 @@ void PathfindingState::DrawUI()
 	}
 	if (ImGui::Button("Return to start"))
 	{
-		_startNode = _waypoints[_waypointIndex];
+		_startNode = _nodePath[_pathIndex];
 		_waypointIndex = 0;
 		_endNode = _waypoints[_waypointIndex];
 

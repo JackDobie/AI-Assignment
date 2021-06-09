@@ -37,7 +37,7 @@ private:
     float fleeWeight = 20.0f;
 
     Vector2D Arrive(Vector2D _target);
-    float arriveWeight = 4.0f;
+    float arriveWeight = 10.0f;
 
     Vector2D Wander(float deltaTime);
 
