@@ -6,6 +6,7 @@ static int carsWithThis = 0;
 
 DecisionMakingState::DecisionMakingState(Vehicle* v) : State(v)
 {
+	_distanceToHitNode = _distanceToHitNodeDefault;
 	_movingToPickUp = false;
 	_overtaking = false;
 	_finished = false;
@@ -61,8 +62,6 @@ void DecisionMakingState::Start()
 	// set the vehicle to seek to the first node in the path
 	_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	_vehicle->SetPositionTo(_targetPos);
-	//_vehicle->GetOtherVehicle()->GetStateMachine()->GetCurrentState()->Exit();
-	//_vehicle->GetOtherVehicle()->GetStateMachine()->GetCurrentState()->Start();
 }
 
 void DecisionMakingState::Exit()
@@ -77,6 +76,7 @@ void DecisionMakingState::Exit()
 	_finished = false;
 	_overtaking = false;
 	_movingToPickUp = false;
+	_distanceToHitNode = _distanceToHitNodeDefault;
 
 	_nodePath.clear();
 }
@@ -84,6 +84,21 @@ void DecisionMakingState::Exit()
 void DecisionMakingState::Update(float deltaTime)
 {
 	_vehicle->SetOvertaking(_overtaking);
+
+	// if this vehicle is trying to overtake the other vehicle, increase the distance required to hit a node
+	if (_overtaking)
+		_distanceToHitNode = _distanceToHitNodeOvertaking;
+	else
+		_distanceToHitNode = _distanceToHitNodeDefault;
+
+	// if the other vehicle has crashed, increase the distance to hit a node to allow for easier overtakes
+	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() < 1.0f)
+	{
+		// only increase distance when in range, to avoid going too far ahead
+		if(Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 500.0f)
+			_distanceToHitNode = _distanceToHitNodeOtherCrashed;
+	}
+
 	// if done five laps
 	if (_finished)
 	{
@@ -119,7 +134,7 @@ void DecisionMakingState::Update(float deltaTime)
 		else
 		{
 			if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetPickUpItem()->GetPositionVector()) <
-				Vec2DDistance(_vehicle->GetPositionVector(), _targetPos))
+				Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()))
 			{
 				_movingToPickUp = true;
 			}
@@ -133,14 +148,14 @@ void DecisionMakingState::Update(float deltaTime)
 			else
 			{
 				// compare distance to check if got in range of the next node
-				if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < 20.0f)
+				if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_nodePath[_pathIndex])->GetPositionVector()) < _distanceToHitNode)
 				{
 					NextNode();
 				}
 			}
 
 			// compare distance to check if got in range of the waypoint
-			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < (_overtaking ? 120.0f : 20.0f))
+			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < _distanceToHitNode)
 			{
 				NextWaypoint();
 			}

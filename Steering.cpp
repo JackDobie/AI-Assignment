@@ -111,7 +111,7 @@ Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 	Vehicle* closestObstacle = nullptr;
 	Vector2D closestObstacleLocalPos = Vector2D();
 
-	float avoidScale = 1.4f;
+	float avoidScale = 1.1f;
 
 	float aRadius = vehicle->GetScale().x * avoidScale;
 	float bRadius = vehicle->GetOtherVehicle()->GetScale().x * avoidScale;

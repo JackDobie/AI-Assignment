@@ -51,4 +51,9 @@ private:
 	bool _overtaking;
 
 	bool _movingToPickUp;
+
+	float _distanceToHitNodeDefault = 20.0f;
+	float _distanceToHitNodeOvertaking = 120.0f;
+	float _distanceToHitNodeOtherCrashed = 150.0f;
+	float _distanceToHitNode;
 };
