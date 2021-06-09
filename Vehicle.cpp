@@ -11,6 +11,7 @@ Vehicle::Vehicle(std::string name, Vector2D startPos, float maxSpeed) : _name(na
 	_speedBoostTimer = 0.0f;
 	_crashTimer = 0.0f;
 	_boundingSphere = new BoundingSphere(XMFLOAT3(0,0,0), 1);
+	_autoPosIndex = 0;
 }
 
 HRESULT	Vehicle::initMesh(ID3D11Device* pd3dDevice, wstring texturePath)
@@ -49,6 +50,22 @@ void Vehicle::Update(float deltaTime)
 			_speedBoostTimer = 0.0f;
 			_crashTimer = 0.0f;
 			_speedFactor = 1.0f;
+		}
+	}
+
+	if (_auto)
+	{
+		if (_stateMachine->GetCurrentState()->GetCurrentState() == 0)
+		{
+			if (Vec2DDistance(_currentPosition, _autoPos[_autoPosIndex]) < 50.0f)
+			{
+				_autoPosIndex = (_autoPosIndex + 1) % (_autoPos.size());
+				_positionTo = _autoPos[_autoPosIndex];
+			}
+			else if (_positionTo == Vector2D())
+			{
+				_positionTo = _autoPos[_autoPosIndex];
+			}
 		}
 	}
 

@@ -59,6 +59,8 @@ void PathfindingState::Exit()
 
 void PathfindingState::Update(float deltaTime)
 {
+	_vehicle->_pathIndex = _pathIndex;
+
 	// if the other vehicle has crashed, increase the distance to hit a node to allow for easier overtakes
 	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() < 1.0f)
 	{
@@ -89,6 +91,7 @@ void PathfindingState::Update(float deltaTime)
 		// go to the next waypoint, or loop around when at the end
 		_startNode = _waypoints[_waypointIndex];
 		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
+		_vehicle->_waypointCount++;
 		_endNode = _waypoints[_waypointIndex];
 
 		ResetNodes();

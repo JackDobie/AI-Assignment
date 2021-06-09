@@ -15,30 +15,23 @@ Vector2D Steering::CalculateForce(float deltaTime)
 	{
 	case BehaviourType::seek:
 		steeringForce = Seek(vehicle->GetTarget()) * seekWeight;
-		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::flee:
 		steeringForce = Flee(vehicle->GetOtherVehicle()->GetPositionVector()) * fleeWeight;
-		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	case BehaviourType::arrive:
 		steeringForce = Arrive(vehicle->GetTarget()) * arriveWeight;
-		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::wander:
 		steeringForce = Wander(deltaTime);
-		vehicle->GetOtherVehicle()->SetActive(false);
 		break;
 	case BehaviourType::obstacle_avoidance:
 		steeringForce = ObstacleAvoidance(vehicle->GetTarget()) * obstacleAvoidWeight;
-		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	case BehaviourType::pursuit:
 		steeringForce = Pursuit(vehicle->GetOtherVehicle()) * pursuitWeight;
-		vehicle->GetOtherVehicle()->SetActive(true);
 		break;
 	default:
-		vehicle->GetOtherVehicle()->SetActive(false);
 		steeringForce = Vector2D();
 	}
 
@@ -109,7 +102,7 @@ Vector2D Steering::Wander(float deltaTime)
 Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 {
 	// creates a box in front of the vehicle to detect obstacles
-	float minDetectionBoxLength = 30.0f;
+	float minDetectionBoxLength = vehicle->GetScale().x;
 	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (*vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
 
 	Vector2D vehPos = vehicle->GetPositionVector();

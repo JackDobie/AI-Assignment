@@ -83,7 +83,7 @@ void DecisionMakingState::Exit()
 
 void DecisionMakingState::Update(float deltaTime)
 {
-	_vehicle->SetOvertaking(_overtaking);
+	_vehicle->_pathIndex = _pathIndex;
 
 	// if this vehicle is trying to overtake the other vehicle, increase the distance required to hit a node
 	if (_overtaking)
@@ -203,6 +203,7 @@ void DecisionMakingState::DrawUI()
 		_vehicle->SetPositionTo(_targetPos);
 		_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	}
+	ImGui::Text(("Overtaking: " + to_string(_overtaking)).c_str());
 	ImGui::End();
 }
 
@@ -230,7 +231,6 @@ void DecisionMakingState::NextNode()
 	if (_pathIndex < _nodePath.size() - 1)
 	{
 		_pathIndex++;
-		_vehicle->_pathIndex = _pathIndex;
 		_targetPos = GetWaypoint(_nodePath[_pathIndex])->GetPositionVector();
 		_vehicle->SetPositionTo(_targetPos);
 	}
@@ -265,7 +265,7 @@ void DecisionMakingState::NextWaypoint()
 		// go to the next waypoint, or loop around when at the end
 		_startNode = _waypoints[_waypointIndex];
 		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
-		_vehicle->_waypointCount = _waypointIndex;
+		_vehicle->_waypointCount++;
 		_endNode = _waypoints[_waypointIndex];
 
 		ResetNodes();

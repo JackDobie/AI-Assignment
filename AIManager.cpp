@@ -56,19 +56,22 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetWaypoints(m_waypoints);
     pCar->InitStateMachine(_steeringState);
     pCar->SetPickUpItem(pPickup);
-    pCar->SetActive(true);
+    pCar->SetAuto(false);
 
     AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
     if (FAILED(hr))
         return hr;
+    _AISteeringState = new SteeringState(AICar);
     _AIPathfindingState = new PathfindingState(AICar);
-    _AIDecisionMakingState = new DecisionMakingState(AICar);
     AICar->SetWaypoints(m_waypoints);
-    AICar->InitStateMachine(_AIPathfindingState);
+    AICar->InitStateMachine(_AISteeringState);
     AICar->SetOtherVehicle(pCar);
     AICar->SetPickUpItem(pPickup);
-    AICar->SetActive(true);
+    AICar->SetAuto(true);
+    AICar->GetSteering()->activeType = Steering::BehaviourType::seek;
+    AICar->SetMaxSpeed(150.0f);
+    AICar->SetPositionTo(Vector2D());
     pCar->SetOtherVehicle(AICar);
 
     return hr;
@@ -113,14 +116,12 @@ void AIManager::update(const float fDeltaTime)
     AddItemToDrawList(pPickup);
 
     pCar->Update(fDeltaTime);
-    if(AICar->GetActive())
-        AICar->Update(fDeltaTime);
+    AICar->Update(fDeltaTime);
 
     checkForCollisions();
 
     AddItemToDrawList(pCar);
-    if (AICar->GetActive())
-        AddItemToDrawList(AICar);
+    AddItemToDrawList(AICar);
 }
 
 void AIManager::mouseUp(int x, int y)
@@ -183,28 +184,11 @@ void AIManager::checkForCollisions()
         pPickup->Collide();
         pCar->Boost();
     }
-    if (boundingSphereAICar->Intersects(boundingSpherePU))
-    {
-        pPickup->Collide();
-        AICar->Boost();
-    }
 
     // if the two cars collide
     if (boundingSphereCar->Intersects(*boundingSphereAICar))
     {
-        // if in decision making mode, both cars can crash. the car that is overtaking will get the penalty
-        // outside of decision making mode, only the player will get the penalty
-        if (pCar->GetStateMachine()->GetCurrentState()->GetCurrentState() == 2)
-        {
-            if (pCar->GetOvertaking())
-                pCar->Collide();
-            else
-                AICar->Collide();
-        }
-        else
-        {
-            pCar->Collide();
-        }
+        pCar->Collide();
     }
 }
 
@@ -273,20 +257,17 @@ void AIManager::DrawUI()
     if (ImGui::RadioButton("Steering", &radioctrl, 0))
     {
         pCar->GetStateMachine()->ChangeState(_steeringState);
-        AICar->GetStateMachine()->ChangeState(_AIPathfindingState);
-        AICar->SetActive(false);
+        AICar->GetStateMachine()->ChangeState(_AISteeringState);
     }
     if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
     {
         pCar->GetStateMachine()->ChangeState(_pathfindingState);
-        AICar->GetStateMachine()->ChangeState(_AIPathfindingState);
-        AICar->SetActive(false);
+        AICar->GetStateMachine()->ChangeState(_AISteeringState);
     }
     if (ImGui::RadioButton("Decision Making", &radioctrl, 2))
     {
         pCar->GetStateMachine()->ChangeState(_decisionMakingState);
-        AICar->GetStateMachine()->ChangeState(_AIDecisionMakingState);
-        AICar->SetActive(true);
+        AICar->GetStateMachine()->ChangeState(_AIPathfindingState);
     }
 
     if (ImGui::Button("Toggle waypoints"))

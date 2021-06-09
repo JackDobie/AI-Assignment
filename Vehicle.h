@@ -48,7 +48,11 @@ protected:
 
 	PickupItem* _pickUpItem;
 
-	bool _active;
+	bool _auto;
+	int _autoPosIndex;
+	Vector2D _autoPos0 = Vector2D(SCREEN_WIDTH - (SCREEN_WIDTH * 1.5f) + 50.0f, 0);
+	Vector2D _autoPos1 = Vector2D(SCREEN_WIDTH - (SCREEN_WIDTH * 0.5f) - 50.0f, 0);
+	vector<Vector2D> _autoPos = { _autoPos0, _autoPos1 };
 public:
 	Vehicle(std::string name, Vector2D startPos, float maxSpeed);
 	virtual HRESULT initMesh(ID3D11Device* pd3dDevice, wstring texturePath);
@@ -117,7 +121,7 @@ public:
 	PickupItem* GetPickUpItem() { return _pickUpItem; }
 	void SetPickUpItem(PickupItem* pickup) { _pickUpItem = pickup; }
 
-	bool GetActive() { return _active; }
-	void SetActive(bool active) { _active = active; }
+	bool GetAuto() { return _auto; }
+	void SetAuto(bool isAuto) { _auto = isAuto; }
 };
 
