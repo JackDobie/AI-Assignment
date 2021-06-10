@@ -46,7 +46,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pPickup->GetNewPosition();
 
     // create the vehicles ------------------------------------------------
-    pCar = new Vehicle("Car", Vector2D(0.0f,0.0f), 200.0f);
+    pCar = new Vehicle("Car", Vector2D(0.0f, 0.0f), 200.0f);
     hr = pCar->initMesh(pd3dDevice, L"Resources\\car_blue.dds");
     if (FAILED(hr))
         return hr;
@@ -58,7 +58,7 @@ HRESULT AIManager::initialise(ID3D11Device* pd3dDevice)
     pCar->SetPickUpItem(pPickup);
     pCar->SetAuto(false);
 
-    AICar = new Vehicle("AICar", Vector2D(0.0f, 225.0f), 200.0f);
+    AICar = new Vehicle("AICar", Vector2D(SCREEN_WIDTH - (SCREEN_WIDTH * 0.5f), 0.0f), 200.0f);
     hr = AICar->initMesh(pd3dDevice, L"Resources\\car_red.dds");
     if (FAILED(hr))
         return hr;
@@ -258,6 +258,8 @@ void AIManager::DrawUI()
     {
         pCar->GetStateMachine()->ChangeState(_steeringState);
         AICar->GetStateMachine()->ChangeState(_AISteeringState);
+        AICar->GetSteering()->activeType = Steering::BehaviourType::seek;
+        AICar->SetPositionTo(Vector2D(0.0f, 0.0f));
     }
     if (ImGui::RadioButton("Pathfinding", &radioctrl, 1))
     {

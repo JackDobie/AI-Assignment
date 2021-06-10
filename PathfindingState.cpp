@@ -61,8 +61,11 @@ void PathfindingState::Update(float deltaTime)
 {
 	_vehicle->_pathIndex = _pathIndex;
 
+	_distToEndNode = Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector());
+	_vehicle->SetDistToEndNode(_distToEndNode);
+
 	// if the other vehicle has crashed, increase the distance to hit a node to allow for easier overtakes
-	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() < 1.0f)
+	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() > 1.0f)
 	{
 		_distanceToHitNode = _distanceToHitNodeBoost;
 	}
@@ -84,14 +87,14 @@ void PathfindingState::Update(float deltaTime)
 	}
 
 	// compare distance to check if got in range of the waypoint
-	if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < _distanceToHitNode)
+	if (_distToEndNode < _distanceToHitNode)
 	{
 		_pathIndex = 0;
 
 		// go to the next waypoint, or loop around when at the end
 		_startNode = _waypoints[_waypointIndex];
 		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
-		_vehicle->_waypointCount++;
+		_vehicle->_waypointCount = _waypointIndex;
 		_endNode = _waypoints[_waypointIndex];
 
 		ResetNodes();

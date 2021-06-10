@@ -85,19 +85,14 @@ void DecisionMakingState::Update(float deltaTime)
 {
 	_vehicle->_pathIndex = _pathIndex;
 
-	// if this vehicle is trying to overtake the other vehicle, increase the distance required to hit a node
-	if (_overtaking)
-		_distanceToHitNode = _distanceToHitNodeOvertaking;
-	else
-		_distanceToHitNode = _distanceToHitNodeDefault;
+	_distToEndNode = Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector());
+	_vehicle->SetDistToEndNode(_distToEndNode);
 
-	// if the other vehicle has crashed, increase the distance to hit a node to allow for easier overtakes
-	if (_vehicle->GetOtherVehicle()->GetSpeedFactor() < 1.0f)
-	{
-		// only increase distance when in range, to avoid going too far ahead
-		if(Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 500.0f)
-			_distanceToHitNode = _distanceToHitNodeOtherCrashed;
-	}
+	//// if this vehicle is trying to overtake the other vehicle, increase the distance required to hit a node
+	//if (_overtaking)
+	//	_distanceToHitNode = _distanceToHitNodeOvertaking;
+	//else
+	//	_distanceToHitNode = _distanceToHitNodeDefault;
 
 	// if done five laps
 	if (_finished)
@@ -106,21 +101,29 @@ void DecisionMakingState::Update(float deltaTime)
 	}
 	else
 	{
-		if (_vehicle->_waypointCount < _vehicle->GetOtherVehicle()->_waypointCount)
+		if (_vehicle->_waypointCount < _vehicle->GetOtherVehicle()->_waypointCount ||
+			_distToEndNode > _vehicle->GetOtherVehicle()->GetDistToEndNode())
 		{
-			_overtaking = true;
-		}
-		else if (_vehicle->_waypointCount == _vehicle->GetOtherVehicle()->_waypointCount)
-		{
-			if (_vehicle->_pathIndex < _vehicle->GetOtherVehicle()->_pathIndex)
-			{
+			// check if in range before overtaking
+			float dist = Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector());
+			if (dist < 150)
 				_overtaking = true;
+		}
+		/*else if (_vehicle->_waypointCount == _vehicle->GetOtherVehicle()->_waypointCount)
+		{
+			if (_distToEndNode < _vehicle->GetOtherVehicle()->GetDistToEndNode())
+			{
+				float dist = Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector());
+				if (dist < (_vehicle->GetScale().x * 3))
+					_overtaking = true;
 			}
 			else
 			{
 				_overtaking = false;
 			}
-		}
+		}*/
+		else
+			_overtaking = false;
 
 		if (_movingToPickUp)
 		{
@@ -134,17 +137,37 @@ void DecisionMakingState::Update(float deltaTime)
 		}
 		else
 		{
-			if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetPickUpItem()->GetPositionVector()) <
-				Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()))
+			if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetPickUpItem()->GetPositionVector()) < _distToEndNode)
 			{
 				_movingToPickUp = true;
 			}
 
-			// if wanting to overtake, go directly to the end node instead of following path to go around track faster
 			if (_overtaking)
 			{
-				_targetPos = GetWaypoint(_endNode)->GetPositionVector();
-				_vehicle->SetPositionTo(GetWaypoint(_endNode)->GetPositionVector());
+				_distanceToHitNode = _distanceToHitNodeOvertaking;
+				// check if in range to overtake
+				if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 150)
+				{
+					// target the side of the other vehicle
+					_targetPos = _vehicle->GetOtherVehicle()->GetPositionVector() + (_vehicle->GetOtherVehicle()->GetSide() * -(_vehicle->GetScale().x * 2));
+					_vehicle->SetPositionTo(_targetPos);
+					// check if hit the target
+					// distance to hit node will be increased while overtaking to allow it to hit while at the side of the other vehicle
+					if (Vec2DDistance(_vehicle->GetPositionVector(), _targetPos) < _distanceToHitNode)
+					{
+						// set the target to the end node to overtake
+						_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+						_vehicle->SetPositionTo(_targetPos);
+						// set overtaking to false to avoid 
+						_overtaking = false;
+					}
+				}
+				else
+				{
+					// if not in range to overtake, just set the target to the end node
+					_targetPos = GetWaypoint(_endNode)->GetPositionVector();
+					_vehicle->SetPositionTo(_targetPos);
+				}
 			}
 			else
 			{
@@ -156,7 +179,7 @@ void DecisionMakingState::Update(float deltaTime)
 			}
 
 			// compare distance to check if got in range of the waypoint
-			if (Vec2DDistance(_vehicle->GetPositionVector(), GetWaypoint(_endNode)->GetPositionVector()) < _distanceToHitNode)
+			if (_distToEndNode < _distanceToHitNode)
 			{
 				NextWaypoint();
 			}
@@ -203,7 +226,6 @@ void DecisionMakingState::DrawUI()
 		_vehicle->SetPositionTo(_targetPos);
 		_vehicle->GetSteering()->activeType = Steering::BehaviourType::obstacle_avoidance;
 	}
-	ImGui::Text(("Overtaking: " + to_string(_overtaking)).c_str());
 	ImGui::End();
 }
 
@@ -227,6 +249,7 @@ void DecisionMakingState::ResetNodes()
 
 void DecisionMakingState::NextNode()
 {
+	_distanceToHitNode = _distanceToHitNodeDefault;
 	// if this isn't the last node in the path, set target to the next node
 	if (_pathIndex < _nodePath.size() - 1)
 	{
@@ -238,6 +261,7 @@ void DecisionMakingState::NextNode()
 
 void DecisionMakingState::NextWaypoint()
 {
+	_distanceToHitNode = _distanceToHitNodeDefault;
 	// if vehicle went from the end waypoint hit the starting waypoint to complete a lap
 	if (_startNode == _waypoints[14] && _endNode == _waypoints[0])
 	{
@@ -246,9 +270,9 @@ void DecisionMakingState::NextWaypoint()
 		{
 			_finished = true;
 
-			// set a stopping position with a random offset between 300-500 x and 100-300 y
+			// set a stopping position with a random offset
 			_targetPos.x = GetWaypoint(_waypoints[0])->GetPositionVector().x + (rand() % (500 - 300 + 1) + 300);
-			_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (300 - 100 + 1) + 100);
+			_targetPos.y = GetWaypoint(_waypoints[0])->GetPositionVector().y - (rand() % (100 - 50 + 1) + 50);
 			_vehicle->SetVelocity(_vehicle->GetVelocity() * 0.4f);
 			// slow down to a stop
 			_vehicle->GetSteering()->activeType = Steering::BehaviourType::arrive;
@@ -265,7 +289,7 @@ void DecisionMakingState::NextWaypoint()
 		// go to the next waypoint, or loop around when at the end
 		_startNode = _waypoints[_waypointIndex];
 		_waypointIndex = (_waypointIndex + 1) % (_waypoints.size());
-		_vehicle->_waypointCount++;
+		_vehicle->_waypointCount = _waypointIndex;
 		_endNode = _waypoints[_waypointIndex];
 
 		ResetNodes();

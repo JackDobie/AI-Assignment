@@ -154,7 +154,6 @@ void Vehicle::DrawUI()
 	}
 
 	ImGui::Text("Current Speed: %.3f", _currentSpeed);
-	ImGui::Text("Max Speed: %.3f", _maxSpeed);
 	if (_speedBoostTimer > 0.0f)
 	{
 		ImGui::Text("Speed boost! Time remaining: %.3f", _speedBoostTimer);

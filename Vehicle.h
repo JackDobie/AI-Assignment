@@ -6,6 +6,7 @@
 #include "Constants.h"
 #include "Steering.h"
 #include "StateMachine.h"
+#include "Debug.h"
 
 class Steering;
 
@@ -45,6 +46,7 @@ protected:
 	BoundingSphere* _boundingSphere;
 
 	bool _overtaking = false;
+	float _distToEndNode = FLT_MAX;
 
 	PickupItem* _pickUpItem;
 
@@ -123,5 +125,8 @@ public:
 
 	bool GetAuto() { return _auto; }
 	void SetAuto(bool isAuto) { _auto = isAuto; }
+
+	float GetDistToEndNode() { return _distToEndNode; }
+	void SetDistToEndNode(float distance) { _distToEndNode = distance; }
 };
 

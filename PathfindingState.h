@@ -43,6 +43,8 @@ private:
 	bool _resetting;
 
 	float _distanceToHitNodeDefault = 30.0f;
-	float _distanceToHitNodeBoost = 60.0f;
+	float _distanceToHitNodeBoost = 90.0f;
 	float _distanceToHitNode;
+
+	float _distToEndNode = FLT_MAX;
 };
