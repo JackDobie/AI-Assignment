@@ -146,10 +146,20 @@ void DecisionMakingState::Update(float deltaTime)
 			{
 				_distanceToHitNode = _distanceToHitNodeOvertaking;
 				// check if in range to overtake
-				if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < 150)
+				if (Vec2DDistance(_vehicle->GetPositionVector(), _vehicle->GetOtherVehicle()->GetPositionVector()) < _distanceToHitNode)
 				{
+					Vector2D rightside = (_vehicle->GetOtherVehicle()->GetSide() * -(_vehicle->GetScale().x * 2));
+					Vector2D leftside = Vector2D(-rightside.x, -rightside.y);
 					// target the side of the other vehicle
-					_targetPos = _vehicle->GetOtherVehicle()->GetPositionVector() + (_vehicle->GetOtherVehicle()->GetSide() * -(_vehicle->GetScale().x * 2));
+					if (Vec2DDistance(_vehicle->GetPositionVector(), rightside) < Vec2DDistance(_vehicle->GetPositionVector(), leftside))
+					{
+						_targetPos = _vehicle->GetOtherVehicle()->GetPositionVector() + rightside;
+					}
+					else
+					{
+						_targetPos = _vehicle->GetOtherVehicle()->GetPositionVector() + leftside;
+					}
+					//_targetPos = _vehicle->GetOtherVehicle()->GetPositionVector() + (_vehicle->GetOtherVehicle()->GetSide() * -(_vehicle->GetScale().x * 2));
 					_vehicle->SetPositionTo(_targetPos);
 					// check if hit the target
 					// distance to hit node will be increased while overtaking to allow it to hit while at the side of the other vehicle

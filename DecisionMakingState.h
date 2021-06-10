@@ -53,7 +53,7 @@ private:
 	bool _movingToPickUp;
 
 	float _distanceToHitNodeDefault = 25.0f;
-	float _distanceToHitNodeOvertaking = 150.0f;
+	float _distanceToHitNodeOvertaking = 180.0f;
 	float _distanceToHitNode;
 
 	float _distToEndNode = FLT_MAX;
