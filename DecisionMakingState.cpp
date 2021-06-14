@@ -20,7 +20,7 @@ DecisionMakingState::DecisionMakingState(Vehicle* v) : State(v)
 	_otherVehicle = _vehicle->GetOtherVehicle();
 	_pathfinder = new Pathfinder();
 	_trackReader = new TrackReader();
-	_trackReader->ReadFile("Resources/waypoints.txt");
+	_trackReader->CreateNodes();
 }
 
 void DecisionMakingState::Start()
@@ -246,7 +246,8 @@ Waypoint* DecisionMakingState::GetWaypoint(node* n)
 
 void DecisionMakingState::ResetNodes()
 {
-	for (node* n : _trackReader->GetNodeVector())
+	vector<node*> nodevec = _trackReader->GetNodeVector();
+	for (node* n : nodevec)
 	{
 		n->visited = false;
 		n->globalGoal = FLT_MAX;

@@ -11,7 +11,7 @@ PathfindingState::PathfindingState(Vehicle* vehicle) : State(vehicle)
 	_drawPath = false;
 	_pathfinder = new Pathfinder();
 	_trackReader = new TrackReader();
-	_trackReader->ReadFile("Resources/waypoints.txt");
+	_trackReader->CreateNodes();
 	_distanceToHitNode = _distanceToHitNodeDefault;
 }
 
@@ -155,7 +155,8 @@ Waypoint* PathfindingState::GetWaypoint(node* n)
 
 void PathfindingState::ResetNodes()
 {
-	for (node* n : _trackReader->GetNodeVector())
+	vector<node*> nodevec = _trackReader->GetNodeVector();
+	for (node* n : nodevec)
 	{
 		n->visited = false;
 		n->globalGoal = FLT_MAX;

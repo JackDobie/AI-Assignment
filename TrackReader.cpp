@@ -1,24 +1,8 @@
 #include "TrackReader.h"
+#include "Debug.h"
 
-bool TrackReader::ReadFile(string filePath)
+bool TrackReader::CreateNodes()
 {
-	// opens the stream
-	ifstream stream(filePath.c_str());
-	// cancels if the file cannot be opened
-	if (!stream.is_open())
-		return false;
-
-	string currentline = "";
-	int rows = 0;
-	vector<string> map;
-	while (getline(stream, currentline))
-	{
-		map.push_back(currentline);
-		rows++;
-	}
-	mapWidth = currentline.length();
-	mapHeight = rows;
-
 	nodes = new node[mapWidth * mapHeight];
 
 	for (int y = 0; y < mapHeight; y++)

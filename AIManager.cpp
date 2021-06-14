@@ -265,6 +265,8 @@ void AIManager::DrawUI()
     {
         pCar->GetStateMachine()->ChangeState(_pathfindingState);
         AICar->GetStateMachine()->ChangeState(_AISteeringState);
+        AICar->GetSteering()->activeType = Steering::BehaviourType::seek;
+        AICar->SetPositionTo(Vector2D(0.0f, 0.0f));
     }
     if (ImGui::RadioButton("Decision Making", &radioctrl, 2))
     {
