@@ -36,7 +36,7 @@ Vector2D Steering::CalculateForce(float deltaTime)
 	}
 
 	// divide the max speed by 200 to get how much faster or slower the car is to the default
-	float turnFactor = *vehicle->GetMaxSpeed() / 225.0f;
+	float turnFactor = *vehicle->GetMaxSpeed() / 200.0f;
 	// multiply steeringforce by turnfactor to speed up or slow down turning with speed
 	return steeringForce * turnFactor;
 }
@@ -69,7 +69,7 @@ Vector2D Steering::Arrive(Vector2D _target)
 	//calculate direction and distance to target
 	Vector2D dir = _target - vehicle->GetPositionVector();
 	float dist = dir.Length();
-	if (dist > 0)
+	if (dist > 0.1f || vehicle->GetCurrentSpeed() > 0.0001f)
 	{
 		//decrease speed with distance
 		float speed = dist / 1.5f;

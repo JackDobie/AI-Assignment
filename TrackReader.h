@@ -8,10 +8,7 @@ using namespace std;
 class TrackReader
 {
 public:
-	TrackReader()
-	{
-		waypoints.resize(15, nullptr);
-	}
+	TrackReader();
 
 	bool CreateNodes();
 

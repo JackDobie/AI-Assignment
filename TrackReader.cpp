@@ -1,6 +1,11 @@
 #include "TrackReader.h"
 #include "Debug.h"
 
+TrackReader::TrackReader()
+{
+	waypoints.resize(15, nullptr);
+}
+
 bool TrackReader::CreateNodes()
 {
 	nodes = new node[mapWidth * mapHeight];
