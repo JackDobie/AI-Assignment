@@ -1,6 +1,5 @@
 #include "Steering.h"
 #include "Vehicle.h"
-#include "Debug.h"
 
 Steering::Steering(Vehicle* veh) : vehicle(veh)
 {
@@ -102,7 +101,7 @@ Vector2D Steering::Wander(float deltaTime)
 Vector2D Steering::ObstacleAvoidance(Vector2D _target)
 {
 	// creates a box in front of the vehicle to detect obstacles
-	float minDetectionBoxLength = vehicle->GetScale().x;
+	float minDetectionBoxLength = vehicle->GetScale().x * 100;
 	float detectionBoxLength = minDetectionBoxLength + (vehicle->GetCurrentSpeed() / (*vehicle->GetMaxSpeed() * vehicle->GetSpeedFactor()) * minDetectionBoxLength);
 
 	Vector2D vehPos = vehicle->GetPositionVector();

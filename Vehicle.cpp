@@ -195,11 +195,7 @@ Waypoint* Vehicle::GetWaypoint(int x, int y)
 
 void Vehicle::Collide()
 {
-	// only collide if the car is in pursuit mode or decision making state
-	if (_steering->activeType == Steering::BehaviourType::pursuit || _stateMachine->GetCurrentState()->GetCurrentState() == 2)
-	{
-		// the vehicle has hit another vehicle so suffers a great speed penalty
-		_speedFactor = 0.5f;
-		_crashTimer = 3.0f;
-	}
+	// the vehicle has hit another vehicle so suffers a great speed penalty
+	_speedFactor = 0.5f;
+	_crashTimer = 3.0f;
 }
