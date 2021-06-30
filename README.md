@@ -1,12 +1,12 @@
 ## Program with steering, pathfinding and decision making states.
 ### Steering:
 #### The player controls the blue car, while the red car moves left and right across the screen.
-Seek - car moves towards the point where the mouse clicks.
-Flee - car moves away from the red car to a certain distance.
-Arrive - car slows down to a stop as it approaches the point where the mouse clicks.
-Wander - car moves in a random direction.
-Obstacle avoidance - car tries to avoid hitting the red car.
-Pursuit - steers towards the red car.
+Seek - car moves towards the point where the mouse clicks.<br>
+Flee - car moves away from the red car to a certain distance.<br>
+Arrive - car slows down to a stop as it approaches the point where the mouse clicks.<br>
+Wander - car moves in a random direction.<br>
+Obstacle avoidance - car tries to avoid hitting the red car.<br>
+Pursuit - steers towards the red car.<br>
 ### Pathfinding:
 The car moves around the track using A* pathfinding. Nodes can be toggled to be visible using the button on the UI.
 ### Decision making:
